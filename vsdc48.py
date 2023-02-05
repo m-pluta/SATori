@@ -64,5 +64,26 @@ def check_truth_assignment(clause_set, assignment):
     return True
 
 
+def branching_sat_solve(clause_set, partial_assignment=[]):
+    if check_truth_assignment(clause_set, partial_assignment):
+        return partial_assignment
+
+    # Find all variables in the clause set (a variable and it's complement are the same)
+    variables = np.unique(np.array([np.abs(literal) for clause in clause_set for literal in clause]))
+    num_variables = len(variables)
+
+    lenPartial = len(partial_assignment)
+
+    if lenPartial == num_variables:
+        return []
+
+    for i in [1, -1]:
+        potential_solution = branching_sat_solve(clause_set, partial_assignment + [i * variables[lenPartial]])
+        if potential_solution != []:
+            return potential_solution
+
+    return []
+
+
 # Testing
-print(simple_sat_solve(clauses))
+print(branching_sat_solve(clauses))
