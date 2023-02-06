@@ -6,7 +6,12 @@ from itertools import product
 
 
 # Open file and read lines
-file = open('W_2,3_ n=8.txt', 'r')
+# file = open('instances/unsat.txt', 'r')
+# file = open('instances/sat.txt', 'r')
+file = open('instances/W_2,3_ n=8.txt', 'r')
+# file = open('instances/PHP-5-4.txt', 'r')
+# file = open('instances/LNP-6.txt', 'r')
+# file = open('instances/8queens.txt', 'r')
 lines = file.readlines()
 
 # Read metadata from DIMACS file
@@ -65,20 +70,25 @@ def check_truth_assignment(clause_set, assignment):
 
 
 def branching_sat_solve(clause_set, partial_assignment=[]):
+    # Find all variables in the clause set (a variable and it's complement are the same)
+    variables = np.unique(np.array([np.abs(literal) for clause in clause_set for literal in clause]))
+
+    result = branching_sat_solve_wrapped(clause_set, partial_assignment, variables)
+
+    return result if result else False
+
+
+def branching_sat_solve_wrapped(clause_set, partial_assignment, variables):
     if check_truth_assignment(clause_set, partial_assignment):
         return partial_assignment
 
-    # Find all variables in the clause set (a variable and it's complement are the same)
-    variables = np.unique(np.array([np.abs(literal) for clause in clause_set for literal in clause]))
-    num_variables = len(variables)
-
     lenPartial = len(partial_assignment)
 
-    if lenPartial == num_variables:
+    if lenPartial == len(variables):
         return []
 
     for i in [1, -1]:
-        potential_solution = branching_sat_solve(clause_set, partial_assignment + [i * variables[lenPartial]])
+        potential_solution = branching_sat_solve_wrapped(clause_set, partial_assignment + [i * variables[lenPartial]], variables)
         if potential_solution != []:
             return potential_solution
 
