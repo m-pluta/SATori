@@ -94,15 +94,16 @@ def branching_sat_solve_wrapped(clause_set, partial_assignment, variables):
 
     return []
 
-def unit_propagate(clause_set):
-    unit_literals = [clause[0] for clause in clause_set if len(clause) == 1] # All unit literals in clause set
+def unit_propagate(clause_set, unit_literals=None):
+    if unit_literals == None:
+        unit_literals = [clause[0] for clause in clause_set if len(clause) == 1] # All unit literals in clause set
 
     if not unit_literals:
         return clause_set
 
     i = 0 # Index of clause
     j = 0 # Index of unit_literal
-    counter = 0
+    new_unit_literals = []
 
     while i < len(clause_set):
         if len(clause_set[i]) != 1:
@@ -115,9 +116,13 @@ def unit_propagate(clause_set):
             elif (-1 * unit_literals[j]) in clause_set[i]:
                 # Remove the variable from clause
                 clause_set[i].remove(-1 * unit_literals[j])
-                # Check next unit literal
-                j += 1
-                counter += 1
+                if (len(clause_set[i]) == 1):
+                    new_unit_literals += clause_set[i]
+                    i += 1
+                    j = 0
+                else:
+                    # Check next unit literal
+                    j += 1
             else:
                 # Incrememnt j
                 j += 1
@@ -129,12 +134,12 @@ def unit_propagate(clause_set):
         else:
             i += 1
 
-    if counter > 0:
-        return unit_propagate(clause_set)
+    if len(new_unit_literals) > 0:
+        return unit_propagate(clause_set, new_unit_literals)
     else:
         return clause_set
 
-print(unit_propagate([[1,2,3],[2,3],[1],[3],[5],[7,8,9],[2,4,5]]))
+print(unit_propagate([[1,2,3],[2,3],[1],[3],[5],[7,8,9],[-1,-3,-5,11],[-3,13], [-1,-5, 6],[2,4,5]]))
 
 
 # Testing
