@@ -42,7 +42,7 @@ def simple_sat_solve(clause_set):
     # Generate all possible truth assignment permutations of length=num_variables
     # e.g. for length=3, [[0,0,0],[0,0,1],[0,1,0],[0,1,1],[1,0,0],[1,0,1],[1,1,0],[1,1,1]]
     truth_assignments = list(product([1, -1], repeat=num_variables))
-
+  
     # Loop through all possible truth assignment and return it if it satisfies the clause set
     for truth_assignment in truth_assignments:
         # Combine each variable with its corresponding truth value
@@ -93,6 +93,48 @@ def branching_sat_solve_wrapped(clause_set, partial_assignment, variables):
             return potential_solution
 
     return []
+
+def unit_propagate(clause_set):
+    unit_literals = [clause[0] for clause in clause_set if len(clause) == 1] # All unit literals in clause set
+
+    if not unit_literals:
+        return clause_set
+
+    i = 0 # Index of clause
+    j = 0 # Index of unit_literal
+    counter = 0
+
+    while i < len(clause_set):
+        if len(clause_set[i]) != 1:
+            if unit_literals[j] in clause_set[i]:
+                # Remove the clause
+                clause_set.pop(i)
+                # i remains the same
+                # j = 0
+                j = 0
+            elif (-1 * unit_literals[j]) in clause_set[i]:
+                # Remove the variable from clause
+                clause_set[i].remove(-1 * unit_literals[j])
+                # Check next unit literal
+                j += 1
+                counter += 1
+            else:
+                # Incrememnt j
+                j += 1
+                # Check if j > len(unit_literals)
+                if j >= len(unit_literals):
+                # If so incremement i, set j = 0
+                    i += 1
+                    j = 0     
+        else:
+            i += 1
+
+    if counter > 0:
+        return unit_propagate(clause_set)
+    else:
+        return clause_set
+
+print(unit_propagate([[1,2,3],[2,3],[1],[3],[5],[7,8,9],[2,4,5]]))
 
 
 # Testing
