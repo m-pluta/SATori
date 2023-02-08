@@ -8,9 +8,9 @@ from itertools import product
 # Open file and read lines
 # file = open('instances/unsat.txt', 'r')
 # file = open('instances/sat.txt', 'r')
-file = open('instances/W_2,3_ n=8.txt', 'r')
+# file = open('instances/W_2,3_ n=8.txt', 'r')
 # file = open('instances/PHP-5-4.txt', 'r')
-# file = open('instances/LNP-6.txt', 'r')
+file = open('instances/LNP-6.txt', 'r')
 # file = open('instances/8queens.txt', 'r')
 lines = file.readlines()
 
@@ -123,12 +123,16 @@ def unit_propagate(clause_set, unit_literals=None):
                 else:
                     # Check next unit literal
                     j += 1
+                    if j >= len(unit_literals):
+                    # If so increment i, set j = 0
+                        i += 1
+                        j = 0   
             else:
-                # Incrememnt j
+                # Increment j
                 j += 1
                 # Check if j > len(unit_literals)
                 if j >= len(unit_literals):
-                # If so incremement i, set j = 0
+                # If so increment i, set j = 0
                     i += 1
                     j = 0     
         else:
@@ -139,8 +143,8 @@ def unit_propagate(clause_set, unit_literals=None):
     else:
         return clause_set
 
-print(unit_propagate([[1,2,3],[2,3],[1],[3],[5],[7,8,9],[-1,-3,-5,11],[-3,13], [-1,-5, 6],[2,4,5]]))
-
+# print(unit_propagate([[1,2,3],[2,3],[1],[3],[5],[7,8,9],[-1,-3,-5,11],[-3,13], [-1,-5, 6],[2,4,5]]))
+print(unit_propagate(clauses))
 
 # Testing
-print(branching_sat_solve(clauses))
+print(branching_sat_solve(unit_propagate(clauses)))
