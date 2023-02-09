@@ -4,33 +4,30 @@ import copy
 import re
 from itertools import product
 
+def openSAT(filepath):
+    # Open file and read lines
+    file = open(filepath, 'r')
+    lines = file.readlines()
 
-# Open file and read lines
-# file = open('instances/unsat.txt', 'r')
-# file = open('instances/sat.txt', 'r')
-# file = open('instances/W_2,3_ n=8.txt', 'r')
-# file = open('instances/PHP-5-4.txt', 'r')
-file = open('instances/LNP-6.txt', 'r')
-# file = open('instances/8queens.txt', 'r')
-lines = file.readlines()
+    # Read metadata from DIMACS file
+    result = re.search(r"^p cnf (\d+) (\d+)$", lines[0])
+    numVariable = result.groups()[0]
+    numClause = result.groups()[1]
 
-# Read metadata from DIMACS file
-result = re.search(r"^p cnf (\d+) (\d+)$", lines[0])
-numVariable = result.groups()[0]
-numClause = result.groups()[1]
+    # Read all clauses
+    clauses = []
+    for i in range(1, len(lines)): # Skip first line metadata at index 0
+        # Split clause in literals
+        clause = lines[i].split(' ')
 
-# Read all clauses
-clauses = []
-for i in range(1, len(lines)): # Skip first line metadata at index 0
-    # Split clause in literals
-    clause = lines[i].split(' ')
-
-    # If it's not a comment
-    if clause[0] != 'c':
-        # Remove line-separator '0' 
-        clause.pop()
-        # Convert all elements in clause to ints and append clause
-        clauses.append([int(i) for i in clause])
+        # If it's not a comment
+        if clause[0] != 'c':
+            # Remove line-separator '0' 
+            clause.pop()
+            # Convert all elements in clause to ints and append clause
+            clauses.append([int(i) for i in clause])
+    
+    return (numVariable, numClause, clauses)
 
 
 # Return satisfying truth assignment for given clause set or return False if it isnt satisfiable
@@ -68,6 +65,12 @@ def check_truth_assignment(clause_set, assignment):
     # Return true if all clauses were satisfied
     return True
 
+def check_truth_assignment_fast(clause_set, assignment):
+    setA = set(assignment)
+    for clause in clause_set:
+        if (setA.isdisjoint(clause)):
+            return False
+    return True
 
 def branching_sat_solve(clause_set, partial_assignment=[]):
     # Find all variables in the clause set (a variable and it's complement are the same)
@@ -143,8 +146,17 @@ def unit_propagate(clause_set, unit_literals=None):
     else:
         return clause_set
 
-# print(unit_propagate([[1,2,3],[2,3],[1],[3],[5],[7,8,9],[-1,-3,-5,11],[-3,13], [-1,-5, 6],[2,4,5]]))
-print(unit_propagate(clauses))
 
 # Testing
-print(branching_sat_solve(unit_propagate(clauses)))
+
+# clauses = openSAT('instances/unsat.txt')
+# clauses = openSAT('instances/sat.txt')
+clauses = openSAT('instances/W_2,3_ n=8.txt')
+# clauses = openSAT('instances/PHP-5-4.txt')
+# clauses = openSAT('instances/LNP-6.txt')
+# clauses = openSAT('instances/8queens.txt')
+
+# print(unit_propagate([[1,2,3],[2,3],[1],[3],[5],[7,8,9],[-1,-3,-5,11],[-3,13], [-1,-5, 6],[2,4,5]]))
+print(unit_propagate(clauses[2]))
+
+print(branching_sat_solve(clauses[2]))
