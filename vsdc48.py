@@ -84,6 +84,27 @@ def branching_sat_solve_wrapped(clause_set, partial_assignment, variables):
     return []
 
 
+def branching_sat_solver(clause_set, partial_assignment=[]):
+    return
+
+def branching_sat_solver_wrapped(clause_set, partial_assignment, remaining_variables):
+    return
+
+def branchOn(clause_set, literal):
+    i = 0
+    while (i < len(clause_set)):
+        clause = clause_set[i]
+        if literal in clause:
+            del clause_set[i]
+            continue
+        elif (-1 * literal) in clause:
+            clause.remove(-1 * literal)
+            if (clause == []):
+                return (False, [])
+        i += 1
+
+    return (True, clause_set)
+
 
 def unit_propagate(clause_set, unit_literals=None):
     if unit_literals == None:
@@ -138,8 +159,8 @@ def unit_propagate(clause_set, unit_literals=None):
 
 
 # clauses = load_dimacs('instances/unsat.txt')
-# clauses = load_dimacs('instances/sat.txt')
-clauses = load_dimacs('instances/W_2,3_ n=8.txt')
+clauses = load_dimacs('instances/sat.txt')
+# clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 # clauses = load_dimacs('instances/PHP-5-4.txt')
 # clauses = load_dimacs('instances/LNP-6.txt')
 # clauses = load_dimacs('instances/8queens.txt')
@@ -154,3 +175,5 @@ clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 # print(np.mean(np.array(timeit.repeat('check_truth_assignment(clauses, assignment)', globals=globals(), number=100, repeat=10000))))
 # print('Fast')
 # print(np.mean(np.array(timeit.repeat('check_truth_assignment_fast(clauses, assignment)', globals=globals(), number=100, repeat=10000))))
+
+print(branchOn(clauses, -2))
