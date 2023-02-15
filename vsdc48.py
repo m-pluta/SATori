@@ -4,29 +4,24 @@ import copy
 import re
 from itertools import product
 
-def openSAT(filepath):
+def load_dimacs(filepath):
     # Open file and read lines
     file = open(filepath, 'r')
     lines = file.readlines()
 
-    # Read metadata from DIMACS file
-    result = re.search(r"^p cnf (\d+) (\d+)$", lines[0])
-    numVariable = result.groups()[0]
-    numClause = result.groups()[1]
-
     # Read all clauses
     clauses = []
-    for i in range(1, len(lines)): # Skip first line metadata at index 0
-        # Split clause in literals
-        clause = lines[i].split(' ')
+    for line in lines:
+        # Split clause into literals
+        clause = line.split(' ')
 
-        # If it's not a comment
-        if clause[0] != 'c':
-            # Remove line-separator '0' 
+        # If it's not a comment or the metadata
+        if not re.match(r"^c|p$", clause[0]):
+            # Remove line-separator '0'
             clause.pop()
             # Convert all elements in clause to ints and append clause
             clauses.append([int(i) for i in clause])
-    
+
     return clauses
 
 
@@ -148,14 +143,16 @@ def unit_propagate(clause_set, unit_literals=None):
 
 # Testing
 
-# clauses = openSAT('instances/unsat.txt')
-# clauses = openSAT('instances/sat.txt')
-clauses = openSAT('instances/W_2,3_ n=8.txt')
-# clauses = openSAT('instances/PHP-5-4.txt')
-# clauses = openSAT('instances/LNP-6.txt')
-# clauses = openSAT('instances/8queens.txt')
+# clauses = load_dimacs('instances/unsat.txt')
+clauses = load_dimacs('instances/sat.txt')
+# clauses = load_dimacs('instances/W_2,3_ n=8.txt')
+# clauses = load_dimacs('instances/PHP-5-4.txt')
+# clauses = load_dimacs('instances/LNP-6.txt')
+# clauses = load_dimacs('instances/8queens.txt')
 
 # print(unit_propagate([[1,2,3],[2,3],[1],[3],[5],[7,8,9],[-1,-3,-5,11],[-3,13], [-1,-5, 6],[2,4,5]]))
 # print(unit_propagate(clauses))
+print(clauses)
+
 
 print(branching_sat_solve(clauses))
