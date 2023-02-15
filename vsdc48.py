@@ -27,7 +27,7 @@ def openSAT(filepath):
             # Convert all elements in clause to ints and append clause
             clauses.append([int(i) for i in clause])
     
-    return (numVariable, numClause, clauses)
+    return clauses
 
 
 # Return satisfying truth assignment for given clause set or return False if it isnt satisfiable
@@ -146,7 +146,6 @@ def unit_propagate(clause_set, unit_literals=None):
     else:
         return clause_set
 
-
 # Testing
 
 # clauses = openSAT('instances/unsat.txt')
@@ -157,6 +156,6 @@ clauses = openSAT('instances/W_2,3_ n=8.txt')
 # clauses = openSAT('instances/8queens.txt')
 
 # print(unit_propagate([[1,2,3],[2,3],[1],[3],[5],[7,8,9],[-1,-3,-5,11],[-3,13], [-1,-5, 6],[2,4,5]]))
-print(unit_propagate(clauses[2]))
+# print(unit_propagate(clauses))
 
-print(branching_sat_solve(clauses[2]))
+print(branching_sat_solve(clauses))
