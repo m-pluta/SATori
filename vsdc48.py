@@ -176,17 +176,15 @@ def unit_propagate(clause_set, unit_literals=None):
 
 
 # clauses = load_dimacs('instances/unsat.txt')
-clauses = load_dimacs('instances/sat.txt')
+# clauses = load_dimacs('instances/sat.txt')
 # clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 # clauses = load_dimacs('instances/PHP-5-4.txt')
 # clauses = load_dimacs('instances/LNP-6.txt')
-# clauses = load_dimacs('instances/8queens.txt')
+clauses = load_dimacs('instances/8queens.txt')
 
 
 # print(unit_propagate([[1,2,3],[2,3],[1],[3],[5],[7,8,9],[-1,-3,-5,11],[-3,13], [-1,-5, 6],[2,4,5]]))
 # print(unit_propagate(clauses))
 
-# import timeit
-# print(np.mean(np.array(timeit.repeat('branching_sat_solver(load_dimacs(\'instances/8queens.txt\'))', globals=globals(), number=1, repeat=30))))
-
-print(branching_sat_solve(clauses))
+import timeit
+print(np.mean(np.array(timeit.repeat('branching_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
