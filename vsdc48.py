@@ -62,37 +62,11 @@ def check_truth_assignment(clause_set, assignment):
 def branching_sat_solve(clause_set, partial_assignment=[]):
     # Find all variables in the clause set (a variable and it's complement are the same)
     variables = np.unique(np.array([np.abs(literal) for clause in clause_set for literal in clause]))
-
-    result = branching_sat_solve_wrapped(clause_set, partial_assignment, variables)
-
-    return result if result else False
-
-def branching_sat_solve_wrapped(clause_set, partial_assignment, variables):
-    if check_truth_assignment(clause_set, partial_assignment):
-        return partial_assignment
-
-    lenPartial = len(partial_assignment)
-
-    if lenPartial == len(variables):
-        return []
-
-    for i in [1, -1]:
-        potential_solution = branching_sat_solve_wrapped(clause_set, partial_assignment + [i * variables[lenPartial]], variables)
-        if potential_solution != []:
-            return potential_solution
-
-    return []
-
-
-def branching_sat_solver(clause_set, partial_assignment=[]):
-    # Find all variables in the clause set (a variable and it's complement are the same)
-    variables = np.unique(np.array([np.abs(literal) for clause in clause_set for literal in clause]))
     
-    result = branching_sat_solver_wrapped(clause_set, partial_assignment, list(variables))
-    print(result)
+    result = branching_sat_solve_wrapped(clause_set, partial_assignment, list(variables))
     return result if result else False
 
-def branching_sat_solver_wrapped(clause_set, partial_assignment, remaining_variables):
+def branching_sat_solve_wrapped(clause_set, partial_assignment, remaining_variables):
     if len(remaining_variables) > 0:
         # Copy clause set and get next variable to branch on
         clause_set_2 = copy.deepcopy(clause_set)
@@ -105,7 +79,7 @@ def branching_sat_solver_wrapped(clause_set, partial_assignment, remaining_varia
             return partial_assignment + [next_variable]
         # If not satisfied and not unsatisfiable (possibly satisfiable)
         elif m_clause_set[1]:
-            result = branching_sat_solver_wrapped(m_clause_set[1], partial_assignment + [next_variable], copy.deepcopy(remaining_variables))
+            result = branching_sat_solve_wrapped(m_clause_set[1], partial_assignment + [next_variable], copy.deepcopy(remaining_variables))
             if result:
                 return result
 
@@ -116,7 +90,7 @@ def branching_sat_solver_wrapped(clause_set, partial_assignment, remaining_varia
             return partial_assignment + [-1 * next_variable]
         # If not satisfied and not unsatisfiable (possibly satisfiable)
         elif m_clause_set[1]:
-            result = branching_sat_solver_wrapped(m_clause_set[1], partial_assignment + [-1 * next_variable], remaining_variables)
+            result = branching_sat_solve_wrapped(m_clause_set[1], partial_assignment + [-1 * next_variable], remaining_variables)
             if result:
                 return result
     
@@ -215,4 +189,4 @@ clauses = load_dimacs('instances/sat.txt')
 # import timeit
 # print(np.mean(np.array(timeit.repeat('branching_sat_solver(load_dimacs(\'instances/8queens.txt\'))', globals=globals(), number=1, repeat=30))))
 
-print(branching_sat_solver(clauses))
+print(branching_sat_solve(clauses))
