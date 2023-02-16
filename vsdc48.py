@@ -85,25 +85,68 @@ def branching_sat_solve_wrapped(clause_set, partial_assignment, variables):
 
 
 def branching_sat_solver(clause_set, partial_assignment=[]):
-    return
+    # Find all variables in the clause set (a variable and it's complement are the same)
+    variables = np.unique(np.array([np.abs(literal) for clause in clause_set for literal in clause]))
+    
+    result = branching_sat_solver_wrapped(clause_set, partial_assignment, list(variables))
+    print(result)
+    return result if result else False
 
 def branching_sat_solver_wrapped(clause_set, partial_assignment, remaining_variables):
-    return
+    if len(remaining_variables) > 0:
+        # Copy clause set and get next variable to branch on
+        clause_set_2 = copy.deepcopy(clause_set)
+        next_variable = remaining_variables.pop(0)
 
-def branchOn(clause_set, literal):
+        # Branch on positive literal
+        m_clause_set = branch(clause_set, next_variable)
+        # If satisfied return the assignment
+        if m_clause_set[0]:
+            return partial_assignment + [next_variable]
+        # If not satisfied and not unsatisfiable (possibly satisfiable)
+        elif m_clause_set[1]:
+            result = branching_sat_solver_wrapped(m_clause_set[1], partial_assignment + [next_variable], copy.deepcopy(remaining_variables))
+            if result:
+                return result
+
+        # Branch on negative literal
+        m_clause_set = branch(clause_set_2, -1 * next_variable)
+        # If satisfied return the assignment
+        if m_clause_set[0]:
+            return partial_assignment + [-1 * next_variable]
+        # If not satisfied and not unsatisfiable (possibly satisfiable)
+        elif m_clause_set[1]:
+            result = branching_sat_solver_wrapped(m_clause_set[1], partial_assignment + [-1 * next_variable], remaining_variables)
+            if result:
+                return result
+    
+    return None
+
+def branch(clause_set, literal):
+    # Loop through each clause
     i = 0
     while (i < len(clause_set)):
+        # Access the clause
         clause = clause_set[i]
+
+        # If exact literal is in the clause then delete the clause
         if literal in clause:
             del clause_set[i]
             continue
+        # If the literal's complement is in the clause then remove the literal from the clause
         elif (-1 * literal) in clause:
             clause.remove(-1 * literal)
+            # If there is now an empty clause then clause is unsatisfiable
             if (clause == []):
-                return (False, [])
+                return (False, None)
         i += 1
-
-    return (True, clause_set)
+    
+    # If clause set is empty then clause_set was satisfied
+    if len(clause_set) == 0:
+        return (True, None)
+    # Else proceed with recursion
+    else:
+        return (False, clause_set)
 
 
 def unit_propagate(clause_set, unit_literals=None):
@@ -170,10 +213,6 @@ clauses = load_dimacs('instances/sat.txt')
 # print(unit_propagate(clauses))
 
 # import timeit
-# assignment = [1, 2, -3, -4, 5, 6, -7, -8, -9, -10, 11, 12, -13, -14, 15, 16]
-# print('Slow')
-# print(np.mean(np.array(timeit.repeat('check_truth_assignment(clauses, assignment)', globals=globals(), number=100, repeat=10000))))
-# print('Fast')
-# print(np.mean(np.array(timeit.repeat('check_truth_assignment_fast(clauses, assignment)', globals=globals(), number=100, repeat=10000))))
+# print(np.mean(np.array(timeit.repeat('branching_sat_solver(load_dimacs(\'instances/8queens.txt\'))', globals=globals(), number=1, repeat=30))))
 
-print(branchOn(clauses, -2))
+print(branching_sat_solver(clauses))
