@@ -66,11 +66,11 @@ def branching_sat_solve(clause_set, partial_assignment=[]):
     result = branching_sat_solve_wrapped(clause_set, partial_assignment, list(variables))
     return result if result else False
 
-def branching_sat_solve_wrapped(clause_set, partial_assignment, remaining_variables):
-    if len(remaining_variables) > 0:
-        # Copy clause set and get next variable to branch on
+def branching_sat_solve_wrapped(clause_set, partial_assignment, variables):
+    if len(partial_assignment) < len(variables):
+        # Copy clause set\ and get next variable to branch on
         clause_set_2 = copy.deepcopy(clause_set)
-        next_variable = remaining_variables.pop(0)
+        next_variable = variables[len(partial_assignment) - 1]
 
         # Branch on positive literal
         m_clause_set = branch(clause_set, next_variable)
@@ -79,7 +79,7 @@ def branching_sat_solve_wrapped(clause_set, partial_assignment, remaining_variab
             return partial_assignment + [next_variable]
         # If not satisfied and not unsatisfiable (possibly satisfiable)
         elif m_clause_set[1]:
-            result = branching_sat_solve_wrapped(m_clause_set[1], partial_assignment + [next_variable], copy.deepcopy(remaining_variables))
+            result = branching_sat_solve_wrapped(m_clause_set[1], partial_assignment + [next_variable], variables)
             if result:
                 return result
 
@@ -90,7 +90,7 @@ def branching_sat_solve_wrapped(clause_set, partial_assignment, remaining_variab
             return partial_assignment + [-1 * next_variable]
         # If not satisfied and not unsatisfiable (possibly satisfiable)
         elif m_clause_set[1]:
-            result = branching_sat_solve_wrapped(m_clause_set[1], partial_assignment + [-1 * next_variable], remaining_variables)
+            result = branching_sat_solve_wrapped(m_clause_set[1], partial_assignment + [-1 * next_variable], variables)
             if result:
                 return result
     
