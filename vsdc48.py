@@ -1,6 +1,5 @@
 # Imports
 import numpy as np
-import copy
 import re
 from itertools import product
 import timeit
@@ -98,7 +97,7 @@ def branch(clause_set, partial_assignment):
     
     for clause in clause_set:
         if branchLiteral not in clause:
-            clause_copy = copy.copy(clause)
+            clause_copy = clause[:]
             if (-1 * branchLiteral) in clause_copy:
                 clause_copy.remove(-1 * branchLiteral)
 
@@ -173,5 +172,3 @@ def unit_propagate(clause_set, unit_literals=None):
 clauses = load_dimacs('instances/8queens.txt')
 
 print(np.mean(np.array(timeit.repeat('branching_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
-
-
