@@ -182,9 +182,7 @@ def unit_propagate(clause_set, unit_literals=None):
 # clauses = load_dimacs('instances/LNP-6.txt')
 clauses = load_dimacs('instances/8queens.txt')
 
+# import timeit
+# print(np.mean(np.array(timeit.repeat('branching_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
 
-# print(unit_propagate([[1,2,3],[2,3],[1],[3],[5],[7,8,9],[-1,-3,-5,11],[-3,13], [-1,-5, 6],[2,4,5]]))
-# print(unit_propagate(clauses))
 
-import timeit
-print(np.mean(np.array(timeit.repeat('branching_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
