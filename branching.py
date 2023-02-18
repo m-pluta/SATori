@@ -26,7 +26,18 @@ def load_dimacs(filepath):
 def branching_sat_solve(clause_set, partial_assignment=[]):
     # Find all variables in the clause set (a variable and it's complement are the same)
     variables = np.unique(np.array([np.abs(literal) for clause in clause_set for literal in clause]))
-    
+
+### CHANGE THIS UP - IMPROVEEEE
+    # abs_variables = np.array([np.abs(literal) for clause in clause_set for literal in clause])
+    # variables, counts = np.unique(abs_variables, return_counts=True)
+    # # Create an array of pairs
+    # pairs = [(variables[i], counts[i]) for i in range(len(variables))]
+    # # Sort the array of pairs in descending order based on frequency
+    # pairs.sort(key=lambda x: x[1], reverse=True)
+    # # Extract the sorted elements2
+    # variables = [pairs[i][0] for i in range(len(variables))]
+
+
     nextVariable = variables[0]
     for truth_assignment in [1,-1]:
         literal = truth_assignment * nextVariable
@@ -61,12 +72,6 @@ def branch(clause_set, partial_assignment):
     branchLiteral = partial_assignment[-1]
     
     for clause in clause_set:
-        # if branchLiteral not in clause:
-        #     clause_copy = copy.copy(clause)
-        #     if (-1 * branchLiteral) in clause_copy:
-        #         clause_copy.remove(-1 * branchLiteral)
-        #     new_clause_set.append(clause_copy)
-
         if branchLiteral not in clause:
             clause_copy = copy.copy(clause)
             if (-1 * branchLiteral) in clause_copy:
