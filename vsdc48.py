@@ -4,6 +4,37 @@ import re
 from itertools import product
 import timeit
 
+def testSuite():
+    clauses = load_dimacs('instances/unsat.txt')
+    result = branching_sat_solve(clauses)
+    assert result == False
+
+    clauses = load_dimacs('instances/sat.txt')
+    result = branching_sat_solve(clauses)
+    assert result == [1, -2]
+    clauses = load_dimacs('instances/sat.txt')
+    assert check_truth_assignment(clauses, result)
+
+    clauses = load_dimacs('instances/W_2,3_ n=8.txt')
+    result = branching_sat_solve(clauses)
+    clauses = load_dimacs('instances/W_2,3_ n=8.txt')
+    assert check_truth_assignment(clauses, result)
+
+    clauses = load_dimacs('instances/PHP-5-4.txt')
+    result = branching_sat_solve(clauses)
+    assert result == False
+
+    clauses = load_dimacs('instances/LNP-6.txt')
+    result = branching_sat_solve(clauses)
+    assert result == False
+
+    clauses = load_dimacs('instances/8queens.txt')
+    result = branching_sat_solve(clauses)
+    clauses = load_dimacs('instances/8queens.txt')
+    assert check_truth_assignment(clauses, result)
+
+    print('All tests passed')
+
 def load_dimacs(filepath):
     # Open file and read lines
     file = open(filepath, 'r')
@@ -172,3 +203,5 @@ def unit_propagate(clause_set, unit_literals=None):
 clauses = load_dimacs('instances/8queens.txt')
 
 print(np.mean(np.array(timeit.repeat('branching_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
+
+testSuite()
