@@ -31,38 +31,39 @@ def branching_sat_solve(clause_set, partial_assignment=[]):
     nextVariable = variables[0]
     for truth_assignment in [1,-1]:
         literal = truth_assignment * nextVariable
-        result = backtrack(clause_set, variables, partial_assignment + [literal], literal)
+        result = backtrack(clause_set, variables, partial_assignment + [literal])
         if result:
             return result
 
     return False
 
 
-def backtrack(clause_set, variables, partial_assignment, branchOn):
-    branched_clause_set = branch(clause_set, branchOn)
+def backtrack(clause_set, variables, partial_assignment):
+    branched_clause_set = branch(clause_set, partial_assignment)
     if [] in branched_clause_set:
         return
-    if clause_set == []:
+    if branched_clause_set == []:
         return partial_assignment
 
     nextVariable = variables[len(partial_assignment)]
     for truth_assignment in [1,-1]:
         literal = truth_assignment * nextVariable
-        result = backtrack(branched_clause_set, variables, partial_assignment + [literal], literal)
+        result = backtrack(branched_clause_set, variables, partial_assignment + [literal])
         if result:
             return result
 
     return
 
 
-def branch(clause_set, literal):
+def branch(clause_set, partial_assignment):
     new_clause_set = []
+    branchLiteral = partial_assignment[-1]
     
     for clause in clause_set:
-        if literal not in clause:
+        if branchLiteral not in clause:
             clause_copy = copy.copy(clause)
-            if (-1 * literal) in clause_copy:
-                clause_copy.remove(-1 * literal)
+            if (-1 * branchLiteral) in clause_copy:
+                clause_copy.remove(-1 * branchLiteral)
             new_clause_set.append(clause_copy)
 
         # if literal not in clause:
