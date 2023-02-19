@@ -113,7 +113,7 @@ def branch(clause_set, partial_assignment):
 
 
 
-def unit_propagate2(clause_set, unit_literals=None):
+def unit_propagate(clause_set, unit_literals=None):
     if unit_literals == None:
         unit_literals = [clause[0] for clause in clause_set if len(clause) == 1] # All unit literals in clause set
 
@@ -139,7 +139,7 @@ def unit_propagate2(clause_set, unit_literals=None):
             new_clause_set.append(clause_copy)
     
     if new_unit_literals:
-        return unit_propagate2(new_clause_set, new_unit_literals)
+        return unit_propagate(new_clause_set, new_unit_literals)
     else:
         return new_clause_set
 
@@ -148,7 +148,7 @@ def unit_propagate2(clause_set, unit_literals=None):
 # clauses = load_dimacs('instances/customSAT.txt')
 # clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 # clauses = load_dimacs('instances/PHP-5-4.txt')
-# clauses = load_dimacs('instances/LNP-6.txt')
-clauses = load_dimacs('instances/8queens.txt')
+clauses = load_dimacs('instances/LNP-6.txt')
+# clauses = load_dimacs('instances/8queens.txt')
 
-print(np.mean(np.array(timeit.repeat('branching_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
+print(np.mean(np.array(timeit.repeat('unit_propagate(clauses)', globals=globals(), number=1, repeat=10000))))
