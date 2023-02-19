@@ -163,6 +163,35 @@ def unit_propagate(clause_set, unit_literals=None):
         return clause_set
 
 
+def unit_propagate2(clause_set, unit_literals=None):
+    if unit_literals == None:
+        unit_literals = [clause[0] for clause in clause_set if len(clause) == 1] # All unit literals in clause set
+
+    # Might be useless
+    if not unit_literals:
+        return clause_set
+
+    new_clause_set = []
+    new_unit_literals = []
+    for clause in clause_set:
+        clause_copy = clause[:]
+        for unit_literal in unit_literals:
+            if unit_literal in clause_copy:
+                clause_copy = []
+                break
+            elif (-1 * unit_literal) in clause_copy:
+                clause_copy.remove(-1 * unit_literal)
+
+        if len(clause_copy) == 1:
+            new_unit_literals.append(clause_copy[0])
+            new_clause_set.append(clause_copy)
+        elif clause_copy:
+            new_clause_set.append(clause_copy)
+    
+    if new_unit_literals:
+        return unit_propagate2(new_clause_set, new_unit_literals)
+    else:
+        return new_clause_set
 
 # clauses = load_dimacs('instances/unsat.txt')
 # clauses = load_dimacs('instances/sat.txt')
