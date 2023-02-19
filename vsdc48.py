@@ -113,56 +113,6 @@ def branch(clause_set, partial_assignment):
 
 
 
-def unit_propagate(clause_set, unit_literals=None):
-    if unit_literals == None:
-        unit_literals = [clause[0] for clause in clause_set if len(clause) == 1] # All unit literals in clause set
-
-    if not unit_literals:
-        return clause_set
-
-    i = 0 # Index of clause
-    j = 0 # Index of unit_literal
-    new_unit_literals = []
-
-    while i < len(clause_set):
-        if len(clause_set[i]) != 1:
-            if unit_literals[j] in clause_set[i]:
-                # Remove the clause
-                clause_set.pop(i)
-                # i remains the same
-                # j = 0
-                j = 0
-            elif (-1 * unit_literals[j]) in clause_set[i]:
-                # Remove the variable from clause
-                clause_set[i].remove(-1 * unit_literals[j])
-                if (len(clause_set[i]) == 1):
-                    new_unit_literals += clause_set[i]
-                    i += 1
-                    j = 0
-                else:
-                    # Check next unit literal
-                    j += 1
-                    if j >= len(unit_literals):
-                    # If so increment i, set j = 0
-                        i += 1
-                        j = 0   
-            else:
-                # Increment j
-                j += 1
-                # Check if j > len(unit_literals)
-                if j >= len(unit_literals):
-                # If so increment i, set j = 0
-                    i += 1
-                    j = 0     
-        else:
-            i += 1
-
-    if len(new_unit_literals) > 0:
-        return unit_propagate(clause_set, new_unit_literals)
-    else:
-        return clause_set
-
-
 def unit_propagate2(clause_set, unit_literals=None):
     if unit_literals == None:
         unit_literals = [clause[0] for clause in clause_set if len(clause) == 1] # All unit literals in clause set
