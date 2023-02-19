@@ -61,7 +61,7 @@ def check_truth_assignment(clause_set, assignment):
 
 def branching_sat_solve(clause_set, partial_assignment=[]):
     # Find all variables in the clause set (a variable and it's complement are the same)
-    variables = np.unique(np.array([np.abs(literal) for clause in clause_set for literal in clause]))
+    variables = get_variables(clause_set)
 
     nextVariable = variables[0]
     for truth_assignment in [1,-1]:
@@ -71,6 +71,9 @@ def branching_sat_solve(clause_set, partial_assignment=[]):
             return result
 
     return False
+
+def get_variables(clause_set):
+    return np.unique(np.array([np.abs(literal) for clause in clause_set for literal in clause]))
 
 def backtrack(clause_set, variables, partial_assignment):
     branched_clause_set = branch(clause_set, partial_assignment)
@@ -148,7 +151,7 @@ def unit_propagate(clause_set, unit_literals=None):
 # clauses = load_dimacs('instances/customSAT.txt')
 # clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 # clauses = load_dimacs('instances/PHP-5-4.txt')
-clauses = load_dimacs('instances/LNP-6.txt')
-# clauses = load_dimacs('instances/8queens.txt')
+# clauses = load_dimacs('instances/LNP-6.txt')
+clauses = load_dimacs('instances/8queens.txt')
 
-print(np.mean(np.array(timeit.repeat('unit_propagate(clauses)', globals=globals(), number=1, repeat=10000))))
+print(np.mean(np.array(timeit.repeat('branching_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
