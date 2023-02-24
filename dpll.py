@@ -82,7 +82,7 @@ def UP(clause_set, unit_literals):
 # clauses = load_dimacs('instances/customSAT.txt')
 # clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 # clauses = load_dimacs('instances/PHP-5-4.txt')
-# clauses = load_dimacs('instances/LNP-6.txt')
-clauses = load_dimacs('instances/8queens.txt')
+clauses = load_dimacs('instances/LNP-6.txt')
+# clauses = load_dimacs('instances/8queens.txt')
 
-print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
+print("dpll", np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))

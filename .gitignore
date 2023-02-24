@@ -5,3 +5,5 @@ test.py
 instances/customSAT.txt
 
 **/*.code-workspace
+
+/__pycache__
