@@ -3,3 +3,5 @@
 # Custom files for debugging
 test.py
 instances/customSAT.txt
+
+**/*.code-workspace
