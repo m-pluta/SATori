@@ -5,9 +5,6 @@ from vsdc48 import load_dimacs
 from collections import Counter
 from itertools import chain
 
-def get_variables(clause_set):
-    return np.unique(np.array([np.abs(literal) for literal in chain.from_iterable(clause_set)]))
-
 def getNextBranchVariable(clause_set):
     return Counter(chain.from_iterable(clause_set)).most_common(1)[0][0]
 
@@ -80,15 +77,20 @@ def branch(clause_set, branchOn):
     else:
         return (False, new_clause_set)
 
+def containsComplementPair(literals):
+    for literal in literals:
+        if -1 * literal in literals:
+            return True
+    return False
 
-clauses = load_dimacs('instances/unsat.txt')
+# clauses = load_dimacs('instances/unsat.txt')
 # clauses = load_dimacs('instances/sat.txt')
 # clauses = load_dimacs('instances/customSAT.txt')
 # clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 # clauses = load_dimacs('instances/PHP-5-4.txt')
 # clauses = load_dimacs('instances/LNP-6.txt')
-# clauses = load_dimacs('instances/8queens.txt')
+clauses = load_dimacs('instances/8queens.txt')
 
-# print("dpll", np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
+# print("dpll", np.mean(np.array(timeit.repeat('dpll_solve(clauses)', globals=globals(), number=1, repeat=1))))
 
 print(dpll_solve(clauses))
