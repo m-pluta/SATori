@@ -8,20 +8,11 @@ def load_dimacs(filepath):
     # Open file and read lines
     file = open(filepath, 'r')
     lines = file.readlines()
-
-    # Read all clauses
+    
     clauses = []
     for line in lines:
-        # Split clause into literals
-        clause = line.split(' ')
-
-        # If it's not a comment or the metadata
-        if not re.match(r"^c|p$", clause[0]):
-            # Remove line-separator '0'
-            clause.pop()
-            # Convert all elements in clause to ints and append clause
-            clauses.append([int(i) for i in clause])
-
+        if line[0] not in ('c', 'p'):
+            clauses.append([int(literal) for literal in line.split() if literal != '0'])
     return clauses
 
 
