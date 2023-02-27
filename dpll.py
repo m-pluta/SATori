@@ -60,7 +60,7 @@ def dpll_solve(clause_set, partial_assignment=[]):
     # Unit propagate with deletion
     unit_literals = [clause[0] for clause in new_clause_set if len(clause) == 1]
     while (unit_literals):
-        if containsComplementPair(new_clause_set):
+        if containsComplementPair(unit_literals):
             return False
         new_clause_set = UP(new_clause_set, unit_literals)
         if [] in new_clause_set:
@@ -121,11 +121,10 @@ def containsComplementPair(literals):
 # clauses = load_dimacs('instances/unsat.txt')
 # clauses = load_dimacs('instances/sat.txt')
 # clauses = load_dimacs('instances/customSAT.txt')
-clauses = load_dimacs('instances/W_2,3_ n=8.txt')
+# clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 # clauses = load_dimacs('instances/PHP-5-4.txt')
 # clauses = load_dimacs('instances/LNP-6.txt')
 # clauses = load_dimacs('instances/8queens.txt')
 
-# print("dpll", np.mean(np.array(timeit.repeat('dpll_solve(clauses)', globals=globals(), number=1, repeat=1))))
-
+# print(np.mean(np.array(timeit.repeat('dpll_solve(clauses)', globals=globals(), number=1, repeat=1))))
 # print(dpll_solve(clauses))
