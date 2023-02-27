@@ -10,8 +10,6 @@ def getNextBranchVariable(clause_set):
     return Counter(chain.from_iterable(clause_set)).most_common(1)[0][0]
 
 def UP(clause_set, unit_literals):
-    # unit_literals = [clause[0] for clause in clause_set if len(clause) == 1]
-
     # Return original clause_set if no unit literals to propagate over
     if not unit_literals:
         return clause_set
@@ -39,7 +37,11 @@ def UP(clause_set, unit_literals):
 def dpll_solve(clause_set, partial_assignment=[]):
     # If first branch then we check initial clause_set
     new_clause_set = clause_set
+    # If first dpll_solve recursion
     if not partial_assignment:
+        # If clause set is empty then sat
+        if not clause_set:
+            return partial_assignment
         # Check if the initial clause_set is unsatisfiable
         if [] in clause_set:
             return False
@@ -56,6 +58,17 @@ def dpll_solve(clause_set, partial_assignment=[]):
         new_clause_set = data
     
     # Unit propagate with deletion
+    unit_literals = [clause[0] for clause in new_clause_set if len(clause) == 1]
+    while (unit_literals):
+        if containsComplementPair(new_clause_set):
+            return False
+        new_clause_set = UP(new_clause_set, unit_literals)
+        if [] in new_clause_set:
+            return False
+        unit_literals = [clause[0] for clause in new_clause_set if len(clause) == 1]
+
+    if not new_clause_set:
+        return partial_assignment
 
     # Choose next branching variable
     nextVariable = getNextBranchVariable(new_clause_set)
@@ -115,4 +128,4 @@ clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 
 # print("dpll", np.mean(np.array(timeit.repeat('dpll_solve(clauses)', globals=globals(), number=1, repeat=1))))
 
-print(dpll_solve(clauses))
+# print(dpll_solve(clauses))
