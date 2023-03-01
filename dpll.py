@@ -48,14 +48,12 @@ def dpll_solve(clause_set, partial_assignment=[]):
     else:
         # Branch on the last variable added to the partial assignment
         branch_data=branch(clause_set, partial_assignment[-1])
-        solution_found = branch_data[0]
-        data = branch_data[1]
-        if not (solution_found or data):
+        if not (branch_data[0] or branch_data[1]):
             return False
-        if solution_found:
+        if branch_data[0]:
             return partial_assignment
 
-        new_clause_set = data
+        new_clause_set = branch_data[1]
     
     # Unit propagate with deletion
     unit_literals = [clause[0] for clause in new_clause_set if len(clause) == 1]
@@ -121,10 +119,10 @@ def containsComplementPair(literals):
 # clauses = load_dimacs('instances/unsat.txt')
 # clauses = load_dimacs('instances/sat.txt')
 # clauses = load_dimacs('instances/customSAT.txt')
-# clauses = load_dimacs('instances/W_2,3_ n=8.txt')
+clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 # clauses = load_dimacs('instances/PHP-5-4.txt')
 # clauses = load_dimacs('instances/LNP-6.txt')
 # clauses = load_dimacs('instances/8queens.txt')
 
-# print(np.mean(np.array(timeit.repeat('dpll_solve(clauses)', globals=globals(), number=1, repeat=1))))
+print(np.mean(np.array(timeit.repeat('dpll_solve(clauses)', globals=globals(), number=1, repeat=1000))))
 # print(dpll_solve(clauses))
