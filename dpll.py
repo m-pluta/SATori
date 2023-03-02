@@ -4,6 +4,7 @@ import timeit
 from vsdc48 import load_dimacs
 from collections import Counter
 from itertools import chain
+from printUtils import printTime
 
 
 # Returns the next variable to branch on, which is the most common one
@@ -138,11 +139,11 @@ def containsComplementPair(literals):
 
 # clauses = load_dimacs('instances/unsat.txt')
 # clauses = load_dimacs('instances/sat.txt')
-# clauses = load_dimacs('instances/customSAT.txt')
+clauses = load_dimacs('instances/customSAT.txt')
 # clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 # clauses = load_dimacs('instances/PHP-5-4.txt')
 # clauses = load_dimacs('instances/LNP-6.txt')
-clauses = load_dimacs('instances/8queens.txt')
+# clauses = load_dimacs('instances/8queens.txt')
 
-print(np.mean(np.array(timeit.repeat('dpll_solve(clauses)', globals=globals(), number=1, repeat=10))))
+printTime(np.mean(np.array(timeit.repeat('dpll_solve(clauses)', globals=globals(), number=1, repeat=1))))
 # print(dpll_solve(clauses))
