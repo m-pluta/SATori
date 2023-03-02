@@ -2,8 +2,3 @@
 **/*.code-workspace
 /.vscode
 /__pycache__
-
-# Custom files for debugging
-test.py
-instances/customSAT.txt
-instances/dpllSAT.txt
