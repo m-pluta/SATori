@@ -1,5 +1,4 @@
 from vsdc48 import *
-from dpll import *
 
 def testSuite1(showResult=True):
     clauses = load_dimacs('instances/unsat.txt')
@@ -68,22 +67,22 @@ def testSuite3(showResult=True):
 
 def testSuite4(showResult=True):
     clauses = load_dimacs('instances/unsat.txt')
-    assert dpll_solve(clauses) == False
+    assert dpll_sat_solve(clauses) == False
     clauses = load_dimacs('instances/sat.txt')
-    assert dpll_solve(clauses) == []
+    assert dpll_sat_solve(clauses) == []
     assert testDPLLsolution(clauses, [])
     clauses = load_dimacs('instances/customSAT.txt')
-    assert dpll_solve(clauses) == [3]
+    assert dpll_sat_solve(clauses) == [3]
     assert testDPLLsolution(clauses, [3])
     clauses = load_dimacs('instances/W_2,3_ n=8.txt')
-    assert dpll_solve(clauses) == [-4, -13, -10]
+    assert dpll_sat_solve(clauses) == [-4, -13, -10]
     assert testDPLLsolution(clauses, [-4, -13, -10])
     clauses = load_dimacs('instances/PHP-5-4.txt')
-    assert dpll_solve(clauses) == False
+    assert dpll_sat_solve(clauses) == False
     clauses = load_dimacs('instances/LNP-6.txt')
-    assert dpll_solve(clauses) == False
+    assert dpll_sat_solve(clauses) == False
     clauses = load_dimacs('instances/8queens.txt')
-    assert dpll_solve(clauses) == [-28, -37, -29, -43, -18, -38, -12, -46, -27, -23, -49, -8, -35, -13, -55, -44, -2, -57, -24, -54, -39, -10, -59, -4, -33, -21, 30, -47, -36, -61, -41, -56, -1, -45]
+    assert dpll_sat_solve(clauses) == [-28, -37, -29, -43, -18, -38, -12, -46, -27, -23, -49, -8, -35, -13, -55, -44, -2, -57, -24, -54, -39, -10, -59, -4, -33, -21, 30, -47, -36, -61, -41, -56, -1, -45]
     assert testDPLLsolution(clauses, [-28, -37, -29, -43, -18, -38, -12, -46, -27, -23, -49, -8, -35, -13, -55, -44, -2, -57, -24, -54, -39, -10, -59, -4, -33, -21, 30, -47, -36, -61, -41, -56, -1, -45])
 
     if showResult:
@@ -100,11 +99,12 @@ def runAllTests():
 def testDPLLsolution(clause_set, dpllSol):
     clause_set = setVars(clause_set, dpllSol)
 
-    unit_literals = [clause[0] for clause in clause_set if len(clause) == 1]
+    unit_literals = set([clause[0] for clause in clause_set if len(clause) == 1])
     while (unit_literals):
         clause_set = UP(clause_set, unit_literals)
-
-        unit_literals = [clause[0] for clause in clause_set if len(clause) == 1]
+        if clause_set is None:
+            return False
+        unit_literals = set([clause[0] for clause in clause_set if len(clause) == 1])
 
     return True if clause_set == [] else False
 
@@ -136,6 +136,6 @@ def setVar(clause_set, var):
 # clauses = load_dimacs('instances/LNP-6.txt')
 # clauses = load_dimacs('instances/8queens.txt')
 
-# print("dpll", np.mean(np.array(timeit.repeat('dpll_solve(clauses)', globals=globals(), number=1, repeat=1))))
+# print("dpll", np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
 
-# print(dpll_solve(clauses))
+# print(dpll_sat_solve(clauses))
