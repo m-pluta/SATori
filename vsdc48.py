@@ -191,7 +191,7 @@ def dpll_sat_solve(clause_set, partial_assignment=[]):
             return False
     else:
         # Branch on the last variable added to the partial assignment
-        branch_clause_set=branch(clause_set, partial_assignment[-1])
+        branch_clause_set=branchDPLL(clause_set, partial_assignment[-1])
         if branch_clause_set == None:
             return False
         if not branch_clause_set:
@@ -234,7 +234,7 @@ def dpll_sat_solve(clause_set, partial_assignment=[]):
 
 # Returns None if [] is generated during branching
 # Returns new_clause_set if branching was successful (could be an empty clause set)
-def branch(clause_set, branchOn):
+def branchDPLL(clause_set, branchOn):
     new_clause_set = []
     
     # Go through each clause
