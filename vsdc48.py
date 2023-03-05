@@ -108,35 +108,29 @@ def branch(clause_set, partial_assignment):
 
 
 
-def unit_propagate(clause_set, unit_literals=None):
-    if unit_literals == None:
-        unit_literals = [clause[0] for clause in clause_set if len(clause) == 1] # All unit literals in clause set
+def unit_propagate(clause_set):
+    unit_literals = [clause[0] for clause in clause_set if len(clause) == 1] # All unit literals in clause set
 
-    # Might be useless
     if not unit_literals:
         return clause_set
 
     new_clause_set = []
-    new_unit_literals = []
     for clause in clause_set:
         clause_copy = clause[:]
         for unit_literal in unit_literals:
             if unit_literal in clause_copy:
-                clause_copy = []
+                clause_copy = None
                 break
             elif (-1 * unit_literal) in clause_copy:
                 clause_copy.remove(-1 * unit_literal)
 
-        if len(clause_copy) == 1:
-            new_unit_literals.append(clause_copy[0])
-            new_clause_set.append(clause_copy)
-        elif clause_copy:
+                if not clause_copy:
+                    break
+
+        if clause_copy is not None:
             new_clause_set.append(clause_copy)
     
-    if new_unit_literals:
-        return unit_propagate(new_clause_set, new_unit_literals)
-    else:
-        return new_clause_set
+    return new_clause_set
 
 
 
@@ -169,7 +163,6 @@ def UP(clause_set, unit_literals):
                 if not clause_copy:
                     return None
 
-        # If the clause
         if clause_copy is not None:
             new_clause_set.append(clause_copy)
     
@@ -272,7 +265,8 @@ def containsComplementPair(literals):
 # clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 # clauses = load_dimacs('instances/PHP-5-4.txt')
 # clauses = load_dimacs('instances/LNP-6.txt')
-clauses = load_dimacs('instances/8queens.txt')
+# clauses = load_dimacs('instances/gt.txt')
+# clauses = load_dimacs('instances/8queens.txt')
 
-printTime(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
-print(dpll_sat_solve(clauses))
+# printTime(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=3))))
+# print(dpll_sat_solve(clauses))
