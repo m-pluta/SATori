@@ -13,6 +13,8 @@ def orderVars(vars):
             order.append(var[0])
     return order
 
+def createPartialAssignment(vars):
+    return dict.fromkeys([abs(var) for var in vars], 0)
 '''
 The watched literal dict
 The initial unit_literals
@@ -21,11 +23,15 @@ The frequency order of variables
 def dictify(clause_set):
     # Count all literals
     vars = Counter(chain.from_iterable(clause_set))
+    order = orderVars(vars)
     
     # Initialise each key in the dict with an empty list
     watched_literals = {}
-    for var in vars.keys():
+    for var in order:
         watched_literals[var] = []
+        watched_literals[-1 * var] = []
+
+    print(watched_literals)
     # Potential alternative:
     # watched_literals = dict.fromkeys(vars.keys(), [])
     
@@ -39,19 +45,20 @@ def dictify(clause_set):
         watched_literals[clause[0]].append(clause)
         watched_literals[clause[1]].append(clause)
 
-    return watched_literals, initial_unit_literals, orderVars(vars)
+    return watched_literals, initial_unit_literals, order
 
 def dpll_sat_solve(clause_set, partial_assignment=[]):
     dict, u_literals, orderVars = dictify(clause_set)
-    result = backtrack(dict, set(partial_assignment), u_literals, orderVars)
+    p_assignment = createPartialAssignment(orderVars)
+    result = backtrack(dict, p_assignment, u_literals, orderVars)
     return result if result else False
 
 def backtrack(dict, partial_assignment, u_literals, orderVars):
-    if u_literals:
-        dict = unit_propagate(dict, u_literals)
+    # if u_literals:
+    #     dict = unit_propagate(dict, u_literals)
         # Add unit literals
 
-    if len(partial_assignment) == len(orderVars):
+    if 0 not in partial_assignment.values():
         return partial_assignment
     
     # if Φ contains an empty clause then
@@ -65,17 +72,15 @@ def backtrack(dict, partial_assignment, u_literals, orderVars):
         result = backtrack(dict, partial_assignment, units, orderVars)
         if result:
             return result
-        partial_assignment.remove(branchLiteral)
+        partial_assignment[abs(branchLiteral)] = 0
 
     return
 
 def setVar(dict, var, partial_assignment):
     units = set()
-    partial_assignment.add(var)
+    partial_assignment[abs(var)] = var
 
-    s_dict = dict[-1 * var]
-
-    for clause in s_dict:
+    for clause in dict[-1 * var]:
         isUnit, newLiteral = nextWatchLiteral(dict, clause, partial_assignment)
         if isUnit:
             units.add(newLiteral)
@@ -95,12 +100,13 @@ def nextWatchLiteral(dict, clause, partial_assignment):
     return False, None
 
 def getUnassignedVariables(clause, partial_assignment):
-    return [literal for literal in clause if (partial_assignment.isdisjoint([literal, -1 * literal]))]
+    return [literal for literal in clause if partial_assignment[abs(literal)] == 0]
 
 def getNextVariable(orderVars, partial_assignment):
     for var in orderVars:
-        if not (var in partial_assignment or -1 * var in partial_assignment):
+        if partial_assignment[abs(var)] == 0:
             return var
+    return None
 
 def unit_propagate(dict, u_literals):
     return dict
@@ -108,6 +114,6 @@ def unit_propagate(dict, u_literals):
 clauses = load_dimacs('instances/customSAT.txt')
 
 
-dpll_sat_solve(clauses)
+print(dpll_sat_solve(clauses))
 
 # printTime(np.mean(timeit.repeat('dictify(clauses)', globals=globals(), number=100, repeat=100)))
