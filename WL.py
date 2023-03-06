@@ -4,7 +4,7 @@ import numpy as np
 from collections import Counter
 from itertools import product, chain
 from printUtils import printTime
-from vsdc48 import load_dimacs, containsComplementPair
+from vsdc48 import load_dimacs, containsComplementPair, check_truth_assignment
 
 # Returns the variables ordered in descending order of occurrence given a Counter object
 def orderVars(vars):
@@ -71,9 +71,10 @@ def backtrack(dict, partial_assignment, u_literals, orderVars):
 
     nextVariable = getNextVariable(orderVars, partial_assignment)
 
-    for t in [1, -1]:
-        branchLiteral = t * nextVariable
+    for branchLiteral in [nextVariable, -1 * nextVariable]:
         units = setVar(dict, branchLiteral, partial_assignment)
+        if units == False:
+            continue
         result = backtrack(dict, partial_assignment, units, orderVars)
         if result:
             return result
@@ -82,32 +83,42 @@ def backtrack(dict, partial_assignment, u_literals, orderVars):
 
     # Unset all u_literals before backtracking
 
-    return
+    return False
 
 def setVar(dict, var, partial_assignment):
     units = set()
     partial_assignment[abs(var)] = var
-
+    
+    newList = []
     for clause in dict[-1 * var]:
-        isUnit, newLiteral = nextWatchLiteral(dict, clause, partial_assignment)
-        if isUnit:
-            units.add(newLiteral)
-        elif newLiteral:
+        if isClauseSat(clause, partial_assignment):
+            newList.append(clause)
+            continue
+        unassigned_variables = [literal for literal in clause if partial_assignment[abs(literal)] == 0]
+        if not unassigned_variables:
+            return False
+        elif len(unassigned_variables) == 1:
+            units.add(unassigned_variables[0])
+            newList.append(clause)
+        else:
+            newLiteral = nextWatchLiteral(dict, clause, unassigned_variables)
             dict[newLiteral].append(clause)
-            dict[-1 * var].remove(clause)
+    
+    dict[-1 * var] = newList
     
     return units
 
-def nextWatchLiteral(dict, clause, partial_assignment):
-    unassigned_variables = [literal for literal in clause if partial_assignment[abs(literal)] == 0]
-    if len(unassigned_variables) == 1:
-        return True, unassigned_variables[0]
-    
+def nextWatchLiteral(dict, clause, unassigned_variables):
     for var in unassigned_variables:
         if clause not in dict[var]:
-            return False, var
-        
-    return False, None
+            return var
+    return None
+
+def isClauseSat(clause, partial_assignment):
+    for literal in clause:
+        if partial_assignment[abs(literal)] == literal:
+            return True
+    return False
 
 def getNextVariable(orderVars, partial_assignment):
     for var in orderVars:
@@ -118,9 +129,11 @@ def getNextVariable(orderVars, partial_assignment):
 def unit_propagate(dict, u_literals):
     return dict
 
-clauses = load_dimacs('instances/customSAT.txt')
+clauses = load_dimacs('instances/sat.txt')
 
-
-print(dpll_sat_solve(clauses))
+sol = dpll_sat_solve(clauses)
+print(sol)
+if sol:
+    print(check_truth_assignment(clauses, sol))
 
 # printTime(np.mean(timeit.repeat('dictify(clauses)', globals=globals(), number=100, repeat=100)))

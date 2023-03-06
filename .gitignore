@@ -2,3 +2,5 @@
 **/*.code-workspace
 /.vscode
 /__pycache__
+
+customSAT2.txt
