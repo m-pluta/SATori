@@ -58,10 +58,46 @@ def dpll_sat_solve(clause_set, partial_assignment=[]):
     result = backtrack(dict, p_assignment, u_literals, orderVars)
     return [i for i in result.values()] if result else False
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def unit_propagate(dict, units, partial_assignment):
+    units_propagated = []
+    u_literals = list(units)
+
+    while u_literals:
+        if containsComplementPair(u_literals):
+            unassignVars(partial_assignment, units_propagated)
+            return False
+        
+        var = u_literals.pop(0)
+        newUnits = setVar(dict, var, partial_assignment)
+        units_propagated += [var]
+        u_literals.extend(list(newUnits))
+
+    return units_propagated
+
+
 def backtrack(dict, partial_assignment, u_literals, orderVars):
-    # if u_literals:
-    #     dict = unit_propagate(dict, u_literals)
-        # Add unit literals
+    if u_literals:
+        u_literals = unit_propagate(dict, u_literals, partial_assignment)
+        if not u_literals:
+            return
+
 
     if 0 not in partial_assignment.values():
         return partial_assignment
@@ -82,8 +118,9 @@ def backtrack(dict, partial_assignment, u_literals, orderVars):
         # Unset all the units found before switching branch
 
     # Unset all u_literals before backtracking
-
+    unassignVars(partial_assignment, u_literals)
     return False
+
 
 def setVar(dict, var, partial_assignment):
     units = set()
@@ -108,6 +145,30 @@ def setVar(dict, var, partial_assignment):
     
     return units
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def unassignVars(partial_assignment, vars):
+    for var in vars:
+        partial_assignment[abs(var)] = 0
+
 def nextWatchLiteral(dict, clause, unassigned_variables):
     for var in unassigned_variables:
         if clause not in dict[var]:
@@ -126,14 +187,11 @@ def getNextVariable(orderVars, partial_assignment):
             return var
     return None
 
-def unit_propagate(dict, u_literals):
-    return dict
-
 clauses = load_dimacs('instances/sat.txt')
 
-sol = dpll_sat_solve(clauses)
-print(sol)
-if sol:
-    print(check_truth_assignment(clauses, sol))
+# sol = dpll_sat_solve(clauses)
+# print(sol)
+# if sol:
+#     print(check_truth_assignment(clauses, sol))
 
-# printTime(np.mean(timeit.repeat('dictify(clauses)', globals=globals(), number=100, repeat=100)))
+# printTime(np.mean(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=1)))
