@@ -29,6 +29,9 @@ def initialiseWatchedLiterals(order):
     # Potential alternative:
     # watched_literals = dict.fromkeys(vars.keys(), [])
 
+def getUnitLiterals(clauses):
+    return set([clause[0] for clause in clauses if len(clause) == 1])
+
 # Return the watched literal dict, initial unit_literals, frequency order of variables
 def dictify(clause_set):
     # Count all literals
@@ -41,14 +44,18 @@ def dictify(clause_set):
     watched_literals = initialiseWatchedLiterals(order)
     
     # List for unit literals found in the initial clause_set
-    initial_unit_literals = set()
+    initial_unit_literals = getUnitLiterals(clause_set)
+
     # Go through each clause set and identify them as a unit clause or give them two watched-literals
-    for clause in clause_set:
-        if len(clause) == 1:
-            initial_unit_literals.add(clause[0])
-            continue
-        watched_literals[clause[0]].append(clause)
-        watched_literals[clause[1]].append(clause)
+    if initial_unit_literals:
+        for clause in clause_set:
+            if initial_unit_literals.isdisjoint(clause):
+                watched_literals[clause[0]].append(clause)
+                watched_literals[clause[1]].append(clause)
+    else:
+        for clause in clause_set:
+            watched_literals[clause[0]].append(clause)
+            watched_literals[clause[1]].append(clause)
 
     return watched_literals, initial_unit_literals, order
 
