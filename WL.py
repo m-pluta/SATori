@@ -123,8 +123,7 @@ def backtrack(dict, partial_assignment, u_literals, orderVars):
 
         # Branch on the variable that was set
         result = backtrack(dict, partial_assignment, units, orderVars)
-        if result:
-            return result
+        return result if result else None
         
         # Unassign the set variable if it didnt lead to a solution
         partial_assignment[abs(branchLiteral)] = 0
