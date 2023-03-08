@@ -256,10 +256,12 @@ def branchDPLL(clause_set, branchOn):
 
 # Returns True if the unit literals contain a complement pair i.e {-1, 1} or {7, -7}
 def containsComplementPair(literals):
+    seen = set()
     # Go through each literal
     for literal in literals:
-        # If its complement is in the literal list then there is a complement pair
-        if -1 * literal in literals:
+        seen.add(literal)
+        # If its complement has already been seen then there is a complement pair
+        if -literal in seen:
             return True
         
     # No complement pairs found
