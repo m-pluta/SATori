@@ -139,11 +139,14 @@ def setVar(dict, var, partial_assignment):
     units = set() # Units found while setting the variable
     partial_assignment[abs(var)] = var # Set the variable in the partial_assignment
     
-    newList = [] # Clauses that should remain in the watch literal
-    for clause in dict[-var]:
+    if not dict[-var]:
+        return units
+
+    newList = dict[-var][:]
+    for i in range(len(newList) - 1, -1, -1):
+        clause = newList[i]
         # If the clause is already true then it keep being watched by that literal, and skip it
         if isClauseSat(clause, partial_assignment):
-            newList.append(clause)
             continue
         
         unassigned_variables = [literal for literal in clause if partial_assignment[abs(literal)] == 0]
@@ -154,11 +157,11 @@ def setVar(dict, var, partial_assignment):
         # The clause is unsat but has one free variable so it is a unit literal
         elif len(unassigned_variables) == 1:
             units.add(unassigned_variables[0])
-            newList.append(clause)
         # The clause is unsat and has >1 free variable so it is possible to switch the watch literal
         else:
             newLiteral = nextWatchLiteral(dict, clause, unassigned_variables)
             dict[newLiteral].append(clause)
+            del newList[i]
     
     dict[-var] = newList # Update the dict
     return units # Return all the unit literals that have been found
