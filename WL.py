@@ -47,8 +47,9 @@ def dictify(clause_set):
         if len(clause) == 1:
             initial_unit_literals.add(clause[0])
             continue
-        watched_literals[clause[0]].append(clause)
-        watched_literals[clause[1]].append(clause)
+        if clause not in watched_literals[clause[0]]:
+            watched_literals[clause[0]].append(clause)
+            watched_literals[clause[1]].append(clause)
 
     return watched_literals, initial_unit_literals, order
 
