@@ -52,6 +52,11 @@ def dictify(clause_set):
 
 # Main callable function
 def dpll_sat_solve(clause_set, partial_assignment=None):
+    if not clause_set:
+        return []
+    if [] in clause_set:
+        return False
+    
     dict, u_literals, orderVars = dictify(clause_set)
     partial_assignment = createPartialAssignment(orderVars)
 
