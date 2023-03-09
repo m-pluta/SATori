@@ -23,7 +23,9 @@ for fileCount in range(1, 1001):
     sat_instance = load_dimacs(fileName)
     result = dpll_sat_solve(sat_instance)
     if not result:
+        print(fileName)
         print('Oops')
+        sys.exit()
     # else:
     #     print(check_truth_assignment(sat_instance, result))
 
@@ -35,7 +37,9 @@ for fileCount in range(1, 1000):
         sat_instance = load_dimacs(fileName)
         result = dpll_sat_solve(sat_instance)
         if not result:
+            print(fileName)
             print('Oops')
+            sys.exit()
         # else:
         #     print(check_truth_assignment(sat_instance, result))
 
