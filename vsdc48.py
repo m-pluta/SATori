@@ -457,12 +457,12 @@ fp = 'sat_instances/'
 # clauses = load_dimacs(fp +'W_2,3_ n=8.txt')
 # clauses = load_dimacs(fp +'PHP-5-4.txt')
 # clauses = load_dimacs(fp +'LNP-6.txt')
-clauses = load_dimacs(fp +'gt.txt')
+# clauses = load_dimacs(fp +'gt.txt')
 # clauses = load_dimacs(fp +'8queens.txt')
 
-print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
+# print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
 
-sol = dpll_sat_solve(clauses)
-print(sol)
-if sol:
-    print(check_truth_assignment(clauses, sol))
+# sol = dpll_sat_solve(clauses)
+# print(sol)
+# if sol:
+#     print(check_truth_assignment(clauses, sol))
