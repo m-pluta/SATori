@@ -1,7 +1,7 @@
 # Imports
 import timeit
 import numpy as np
-from collections import Counter
+from collections import Counter, deque
 from itertools import product, chain
 from printUtils import printTime
 
@@ -107,29 +107,32 @@ def branch(clause_set, partial_assignment):
 
 
 def unit_propagate(clause_set):
-    unit_literals = [clause[0] for clause in clause_set if len(clause) == 1] # All unit literals in clause set
+    # All unit literals in clause set
+    unit_literals = [clause[0] for clause in clause_set if len(clause) == 1]
 
+    # If there is no unit-literals
     if not unit_literals:
         return clause_set
-
-    new_clause_set = []
-    for clause in clause_set:
-        clause_copy = clause[:]
-        for unit_literal in unit_literals:
-            if unit_literal in clause_copy:
-                clause_copy = None
-                break
-            elif (-unit_literal) in clause_copy:
-                clause_copy.remove(-unit_literal)
-
-                if not clause_copy:
-                    break
-
-        if clause_copy is not None:
-            new_clause_set.append(clause_copy)
     
-    return new_clause_set
+    # Create a queue for the unit_literals
+    unit_queue = deque(unit_literals)
 
+
+    return_clause_set = clause_set
+    while unit_queue:
+        nextUnit = unit_queue.popleft()
+        new_clause_set = []
+        for clause in return_clause_set:
+            if nextUnit not in clause:
+                clause_copy = [literal for literal in clause[:] if literal != -nextUnit]
+                if len(clause_copy) == 1:
+                    unit_queue.append(clause_copy[0])
+                else:
+                    new_clause_set.append(clause_copy)
+
+        return_clause_set = new_clause_set
+
+    return return_clause_set
 
 
 # Returns the next variable to branch on, which is the most common one
@@ -266,7 +269,7 @@ fp = 'sat_instances/'
 # clauses = load_dimacs(fp +'customSAT.txt')
 # clauses = load_dimacs(fp +'W_2,3_ n=8.txt')
 # clauses = load_dimacs(fp +'PHP-5-4.txt')
-clauses = load_dimacs(fp +'LNP-6.txt')
+# clauses = load_dimacs(fp +'LNP-6.txt')
 # clauses = load_dimacs(fp +'gt.txt')
 # clauses = load_dimacs(fp +'8queens.txt')
 
