@@ -52,12 +52,15 @@ def check_truth_assignment(clause_set, assignment):
 
 
 def branching_sat_solve(clause_set, partial_assignment=[]):
+    if not clause_set:
+        return []
+    if [] in clause_set:
+        return False
     # Find all variables in the clause set (a variable and it's complement are the same)
     variables = get_variables(clause_set)
 
     nextVariable = variables[0]
-    for truth_assignment in [1,-1]:
-        literal = truth_assignment * nextVariable
+    for literal in [nextVariable,-nextVariable]:
         result = backtrack(clause_set, variables, partial_assignment + [literal])
         if result:
             return result
@@ -69,23 +72,21 @@ def get_variables(clause_set):
 
 def backtrack(clause_set, variables, partial_assignment):
     branched_clause_set = branch(clause_set, partial_assignment)
-    if not (branched_clause_set[0] or branched_clause_set[1]):
+    if branched_clause_set is None:
         return
-    if branched_clause_set[0]:
+    if not branched_clause_set:
         return partial_assignment
 
     nextVariable = variables[len(partial_assignment)]
-    for truth_assignment in [1,-1]:
-        literal = truth_assignment * nextVariable
-        result = backtrack(branched_clause_set[1], variables, partial_assignment + [literal])
+    for literal in [nextVariable,-nextVariable]:
+        result = backtrack(branched_clause_set, variables, partial_assignment + [literal])
         if result:
             return result
 
     return
 
-# (True, None) if partial_assignment satisfies the clause_set
-# (False, None) if there was an empty clause created in the clause_set
-# (False, new_clause_set) if the branch was successful
+# None if there was an empty clause created in the clause_set
+# new_clause_set if the branch was successful, new_clause_set may be empty
 def branch(clause_set, partial_assignment):
     new_clause_set = []
     branchLiteral = partial_assignment[-1]
@@ -93,18 +94,15 @@ def branch(clause_set, partial_assignment):
     for clause in clause_set:
         if branchLiteral not in clause:
             clause_copy = clause[:]
-            if (-1 * branchLiteral) in clause_copy:
-                clause_copy.remove(-1 * branchLiteral)
+            if (-branchLiteral) in clause_copy:
+                clause_copy.remove(-branchLiteral)
 
                 if (clause_copy == []):
-                    return (False, None)
+                    return None
             
             new_clause_set.append(clause_copy)
 
-    if new_clause_set == []:
-        return (True, None)
-    else:
-        return (False, new_clause_set)
+    return new_clause_set
 
 
 
@@ -121,8 +119,8 @@ def unit_propagate(clause_set):
             if unit_literal in clause_copy:
                 clause_copy = None
                 break
-            elif (-1 * unit_literal) in clause_copy:
-                clause_copy.remove(-1 * unit_literal)
+            elif (-unit_literal) in clause_copy:
+                clause_copy.remove(-unit_literal)
 
                 if not clause_copy:
                     break
@@ -157,8 +155,8 @@ def UP(clause_set, unit_literals):
                 clause_copy = None
                 break
             # If the complemented literal is in the clause then remove the variable
-            elif (-1 * unit_literal) in clause_copy:
-                clause_copy.remove(-1 * unit_literal)
+            elif (-unit_literal) in clause_copy:
+                clause_copy.remove(-unit_literal)
 
                 if not clause_copy:
                     return None
@@ -215,8 +213,7 @@ def dpll_sat_solve(clause_set, partial_assignment=[]):
 # Branching to next variables
 
     # Branch on each truth assignment
-    for truth_assignment in [1,-1]:
-        literal = truth_assignment * nextVariable
+    for literal in [nextVariable,-nextVariable]:
         # Store branch result
         result = dpll_sat_solve(new_clause_set, partial_assignment + [literal])
         # If a result was returned then it must be a solution
@@ -236,8 +233,8 @@ def branchDPLL(clause_set, branchOn):
         if branchOn not in clause:
             # Copy the clause
             clause_copy = clause[:]
-            if (-1 * branchOn) in clause_copy:
-                clause_copy.remove(-1 * branchOn)
+            if (-branchOn) in clause_copy:
+                clause_copy.remove(-branchOn)
 
                 # If the clause is empty after removal then clause_set is unsat and return
                 if not clause_copy:
@@ -252,7 +249,7 @@ def containsComplementPair(literals):
     # Go through each literal
     for literal in literals:
         # If its complement is in the literal list then there is a complement pair
-        if -1 * literal in literals:
+        if -literal in literals:
             return True
         
     # No complement pairs found
