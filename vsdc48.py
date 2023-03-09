@@ -329,7 +329,7 @@ def dpll_sat_solve(clause_set, partial_assignment=None):
 # Iterative unit propagation
 def unit_propagateWL(dict, units, partial_assignment):
     units_propagated = [] # Unit literals that have so far been set to true
-    u_literals = list(units)
+    u_literals = deque(units)
     mainLEFV = None
 
     while u_literals:
@@ -340,13 +340,13 @@ def unit_propagateWL(dict, units, partial_assignment):
             unassignVars(partial_assignment, units_propagated)
             return None, False
         
-        nextUnit = u_literals.pop(0)
+        nextUnit = u_literals.popleft()
 
         # Set the unit literal to true and add new unit literals to the queue
         lefv, newUnits = setVar(dict, nextUnit, partial_assignment)
         if lefv:
             mainLEFV = lefv
-        u_literals.extend(list(newUnits))
+        u_literals.extend(newUnits)
         units_propagated.append(nextUnit)
 
     return mainLEFV, units_propagated
@@ -465,3 +465,7 @@ fp = 'sat_instances/'
 clauses = load_dimacs(fp +'8queens.txt')
 
 print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=10, repeat=100))))
+
+sol = dpll_sat_solve(clauses)
+if sol:
+    print(check_truth_assignment(clauses, sol))
