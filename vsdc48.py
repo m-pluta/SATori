@@ -330,6 +330,7 @@ def dpll_sat_solve(clause_set, partial_assignment=None):
 def unit_propagateWL(dict, units, partial_assignment):
     units_propagated = [] # Unit literals that have so far been set to true
     u_literals = list(units)
+    lefv = None
 
     while u_literals:
         # If there is complement pair in the literal list then there is a conflict
@@ -337,23 +338,28 @@ def unit_propagateWL(dict, units, partial_assignment):
         if containsComplementPair(u_literals):
             # Unassign all the variables that have been so far set to true during unit prop and return
             unassignVars(partial_assignment, units_propagated)
-            return False
+            return lefv, False
         
         nextUnit = u_literals.pop(0)
 
+        lefvArr = [0]    
         # Set the unit literal to true and add new unit literals to the queue
-        newUnits = setVar(dict, nextUnit, partial_assignment)
+        newUnits = setVarLEFV(dict, nextUnit, partial_assignment, lefvArr)
         u_literals.extend(list(newUnits))
         units_propagated.append(nextUnit)
 
-    return units_propagated
+        if (var:= lefvArr[0]) != 0:
+            lefv = var
+
+    return lefv, units_propagated
 
 # Main function
 def backtrackWL(dict, partial_assignment, u_literals, orderVars):
+    lefv = None
     if u_literals:
         # Unit Propagate functions returns all units that were iteratively propagated over
         # Provided units could have led to more unit literals
-        u_literals = unit_propagateWL(dict, u_literals, partial_assignment)
+        lefv, u_literals = unit_propagateWL(dict, u_literals, partial_assignment)
         if not u_literals:
             # If the unit prop returned False then there was a ComplementPair conflict
             return
@@ -362,7 +368,7 @@ def backtrackWL(dict, partial_assignment, u_literals, orderVars):
     if 0 not in partial_assignment.values():
         return partial_assignment
 
-    nextVariable = getNextVariable(orderVars, partial_assignment)
+    nextVariable = lefv if (lefv != None) else getNextVariable(orderVars, partial_assignment)
 
     for branchLiteral in [nextVariable, -nextVariable]:
         # Set the branch variable
@@ -390,7 +396,44 @@ def setVar(dict, var, partial_assignment):
     partial_assignment[abs(var)] = var # Set the variable in the partial_assignment
     
     newList = [] # Clauses that should remain in the watch literal
-    for clause in dict[-var]:
+    for count, clause in enumerate(dict[-var]):
+        # If the clause is already true then it keep being watched by that literal, and skip it
+        if isClauseSat(clause, partial_assignment):
+            newList.append(clause)
+            continue
+        
+        unassigned_variables = [literal for literal in clause if partial_assignment[abs(literal)] == 0]
+        
+        # The clause is unsat and has no free variables so it is an empty clause
+        if not unassigned_variables:
+            newList = newList + dict[-var][count:0]
+            dict[-var] = newList
+            return False
+        # The clause is unsat but has one free variable so it is a unit literal
+        elif len(unassigned_variables) == 1:
+            units.add(unassigned_variables[0])
+            newList.append(clause)
+        # The clause is unsat and has >1 free variable so it is possible to switch the watch literal
+        else:
+            if clause == [-47, -42, 38]:
+                print(count(dict, clause))
+                print()
+
+            newLiteral = nextWatchLiteral(dict, clause, unassigned_variables)
+            dict[newLiteral].append(clause)
+    
+    dict[-var] = newList
+    
+    # Return all the unit literals that have been found
+    return units
+
+# Sets the variable, updates the dict and partial_assignment
+def setVarLEFV(dict, var, partial_assignment, lefvArr):
+    units = set() # Units found while setting the variable
+    partial_assignment[abs(var)] = var # Set the variable in the partial_assignment
+    
+    newList = [] # Clauses that should remain in the watch literal
+    for count, clause in enumerate(dict[-var]):
         # If the clause is already true then it keep being watched by that literal, and skip it
         if isClauseSat(clause, partial_assignment):
             newList.append(clause)
@@ -407,13 +450,32 @@ def setVar(dict, var, partial_assignment):
             newList.append(clause)
         # The clause is unsat and has >1 free variable so it is possible to switch the watch literal
         else:
+            if clause == [-47, -42, 38]:
+                print(count(dict, clause))
+                print()
+
             newLiteral = nextWatchLiteral(dict, clause, unassigned_variables)
+            if newLiteral == None:
+                print()
+            if count(dict, clause) == 3:
+                print()
             dict[newLiteral].append(clause)
+            lefvArr[0] = newLiteral
     
+    if var == -38:
+        print()
     dict[-var] = newList
     
     # Return all the unit literals that have been found
     return units
+
+def count(dict, clause):
+    count = 0
+    for literal in clause:
+        if clause in dict[literal]:
+            count += 1
+    return count
+
 
 # Given a list of variables, they are set to 0 in the partial assignment (unassigned)
 def unassignVars(partial_assignment, vars):
@@ -454,7 +516,9 @@ fp = 'sat_instances/'
 # clauses = load_dimacs(fp +'W_2,3_ n=8.txt')
 # clauses = load_dimacs(fp +'PHP-5-4.txt')
 # clauses = load_dimacs(fp +'LNP-6.txt')
-# clauses = load_dimacs(fp +'gt.txt')
+clauses = load_dimacs(fp +'gt.txt')
 # clauses = load_dimacs(fp +'8queens.txt')
 
-# print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=10, repeat=100))))
+# print(dpll_sat_solve(clauses))
+
+print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=10, repeat=100))))
