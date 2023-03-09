@@ -257,6 +257,8 @@ def containsComplementPair(literals):
     # No complement pairs found
     return False
 
+
+
 fp = 'sat_instances/'
 
 # clauses = load_dimacs(fp +'unsat.txt')
@@ -264,7 +266,7 @@ fp = 'sat_instances/'
 # clauses = load_dimacs(fp +'customSAT.txt')
 # clauses = load_dimacs(fp +'W_2,3_ n=8.txt')
 # clauses = load_dimacs(fp +'PHP-5-4.txt')
-# clauses = load_dimacs(fp +'gt.txt')
+clauses = load_dimacs(fp +'LNP-6.txt')
 # clauses = load_dimacs(fp +'gt.txt')
 # clauses = load_dimacs(fp +'8queens.txt')
 
