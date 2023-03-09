@@ -257,15 +257,16 @@ def containsComplementPair(literals):
     # No complement pairs found
     return False
 
+fp = 'sat_instances/'
 
-# clauses = load_dimacs('instances/unsat.txt')
-# clauses = load_dimacs('instances/sat.txt')
-# clauses = load_dimacs('instances/customSAT.txt')
-# clauses = load_dimacs('instances/W_2,3_ n=8.txt')
-# clauses = load_dimacs('instances/PHP-5-4.txt')
-# clauses = load_dimacs('instances/gt.txt')
-# clauses = load_dimacs('instances/gt.txt')
-# clauses = load_dimacs('instances/8queens.txt')
+# clauses = load_dimacs(fp +'unsat.txt')
+# clauses = load_dimacs(fp +'sat.txt')
+# clauses = load_dimacs(fp +'customSAT.txt')
+# clauses = load_dimacs(fp +'W_2,3_ n=8.txt')
+# clauses = load_dimacs(fp +'PHP-5-4.txt')
+# clauses = load_dimacs(fp +'gt.txt')
+# clauses = load_dimacs(fp +'gt.txt')
+# clauses = load_dimacs(fp +'8queens.txt')
 
 # printTime(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=3))))
 # print(dpll_sat_solve(clauses))

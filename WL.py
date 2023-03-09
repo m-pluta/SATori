@@ -192,7 +192,7 @@ def getNextVariable(orderVars, partial_assignment):
             return var
     return None
 
-clauses = load_dimacs('instances/8queens.txt')
+clauses = load_dimacs('sat_instances/8queens.txt')
 
 sol = dpll_sat_solve(clauses)
 print(sol)

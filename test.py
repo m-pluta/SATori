@@ -128,13 +128,15 @@ def setVar(clause_set, var):
 
 # runAllTests()
 
-# clauses = load_dimacs('instances/unsat.txt')
-# clauses = load_dimacs('instances/sat.txt')
-# clauses = load_dimacs('instances/customSAT.txt')
-clauses = load_dimacs('instances/W_2,3_ n=8.txt')
-# clauses = load_dimacs('instances/PHP-5-4.txt')
-# clauses = load_dimacs('instances/LNP-6.txt')
-# clauses = load_dimacs('instances/8queens.txt')
+fp = 'sat_instances/'
+
+# clauses = load_dimacs(fp +'unsat.txt')
+# clauses = load_dimacs(fp +'sat.txt')
+# clauses = load_dimacs(fp +'customSAT.txt')
+# clauses = load_dimacs(fp +'W_2,3_ n=8.txt')
+# clauses = load_dimacs(fp +'PHP-5-4.txt')
+# clauses = load_dimacs(fp +'LNP-6.txt')
+# clauses = load_dimacs(fp +'8queens.txt')
 
 # print("dpll", np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
 
