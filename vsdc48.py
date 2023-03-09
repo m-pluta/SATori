@@ -333,21 +333,18 @@ def unit_propagateWL(dict, units, partial_assignment):
     mainLEFV = None
 
     while u_literals:
-        # If there is complement pair in the literal list then there is a conflict
-        # e.g. if 1 and -1 are in the list then both of them cannot be true
-        if containsComplementPair(u_literals):
-            # Unassign all the variables that have been so far set to true during unit prop and return
-            unassignVars(partial_assignment, units_propagated)
-            return None, False
-        
         nextUnit = u_literals.popleft()
 
         # Set the unit literal to true and add new unit literals to the queue
         lefv, newUnits = setVar(dict, nextUnit, partial_assignment)
+        units_propagated.append(nextUnit)
+        if newUnits == False:
+            unassignVars(partial_assignment, units_propagated)
+            return None, False
+        u_literals.extend(newUnits)
+
         if lefv:
             mainLEFV = lefv
-        u_literals.extend(newUnits)
-        units_propagated.append(nextUnit)
 
     return mainLEFV, units_propagated
 
@@ -461,11 +458,12 @@ fp = 'sat_instances/'
 # clauses = load_dimacs(fp +'W_2,3_ n=8.txt')
 # clauses = load_dimacs(fp +'PHP-5-4.txt')
 # clauses = load_dimacs(fp +'LNP-6.txt')
-# clauses = load_dimacs(fp +'gt.txt')
-clauses = load_dimacs(fp +'8queens.txt')
+clauses = load_dimacs(fp +'gt.txt')
+# clauses = load_dimacs(fp +'8queens.txt')
 
-print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=10, repeat=100))))
+print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
 
 sol = dpll_sat_solve(clauses)
+print(sol)
 if sol:
     print(check_truth_assignment(clauses, sol))

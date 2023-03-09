@@ -19,7 +19,7 @@ def uf20():
     print("uf20")
     for fileCount in range(1, 1001):
         fileName = f'sat_instances/uf20/uf20-0{fileCount}.cnf'
-        print(fileCount)
+        # print(fileCount)
         sat_instance = load_dimacs(fileName)
         result = dpll_sat_solve(sat_instance)
         if not result:
@@ -31,7 +31,7 @@ def flat50():
     for fileCount in range(1, 1000):
         if fileCount != 73:
             fileName = f'sat_instances/flat50/flat50-{fileCount}.cnf'
-            print(fileCount)
+            # print(fileCount)
             sat_instance = load_dimacs(fileName)
             result = dpll_sat_solve(sat_instance)
             if not result:
@@ -42,9 +42,10 @@ def CBS():
     print("CBS")
     for clauseCount in [403]:
         for backboneSize in [10, 30, 50, 70, 90]:
+            print('bs', backboneSize)
             mainFileName = f'CBS_k3_n100_m{clauseCount}_b{backboneSize}'
             for (fileCount) in range(0, 1000):
-                print(fileCount)
+                # print(fileCount)
                 fileName = f'sat_instances/{mainFileName}/{mainFileName}_{fileCount}.cnf'
                 sat_instance = load_dimacs(fileName)
                 result = dpll_sat_solve(sat_instance)
@@ -58,7 +59,7 @@ def sw100():
         mainFileName = f'sat_instances/sw100-8-lp{p}-c5/SW100-8-{p}/sw100'
         for (fileCount) in range(1, 101):
             if fileCount != 16:
-                print(fileCount)
+                # print(fileCount)
                 fileName = f'{mainFileName}-{fileCount}.cnf'
                 sat_instance = load_dimacs(fileName)
                 result = dpll_sat_solve(sat_instance)
