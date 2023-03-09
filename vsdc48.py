@@ -330,6 +330,7 @@ def dpll_sat_solve(clause_set, partial_assignment=None):
 def unit_propagateWL(dict, units, partial_assignment):
     units_propagated = [] # Unit literals that have so far been set to true
     u_literals = list(units)
+    mainLEFV = None
 
     while u_literals:
         # If there is complement pair in the literal list then there is a conflict
@@ -337,23 +338,25 @@ def unit_propagateWL(dict, units, partial_assignment):
         if containsComplementPair(u_literals):
             # Unassign all the variables that have been so far set to true during unit prop and return
             unassignVars(partial_assignment, units_propagated)
-            return False
+            return None, False
         
         nextUnit = u_literals.pop(0)
 
         # Set the unit literal to true and add new unit literals to the queue
-        newUnits = setVar(dict, nextUnit, partial_assignment)
+        lefv, newUnits = setVar(dict, nextUnit, partial_assignment)
+        if lefv:
+            mainLEFV = lefv
         u_literals.extend(list(newUnits))
         units_propagated.append(nextUnit)
 
-    return units_propagated
+    return mainLEFV, units_propagated
 
 # Main function
-def backtrackWL(dict, partial_assignment, u_literals, orderVars):
+def backtrackWL(dict, partial_assignment, u_literals, orderVars, lefv=None):
     if u_literals:
         # Unit Propagate functions returns all units that were iteratively propagated over
         # Provided units could have led to more unit literals
-        u_literals = unit_propagateWL(dict, u_literals, partial_assignment)
+        lefv, u_literals = unit_propagateWL(dict, u_literals, partial_assignment)
         if not u_literals:
             # If the unit prop returned False then there was a ComplementPair conflict
             return
@@ -362,18 +365,18 @@ def backtrackWL(dict, partial_assignment, u_literals, orderVars):
     if 0 not in partial_assignment.values():
         return partial_assignment
 
-    nextVariable = getNextVariable(orderVars, partial_assignment)
+    nextVariable = lefv if (lefv is not None) else getNextVariable(orderVars, partial_assignment)
 
     for branchLiteral in [nextVariable, -nextVariable]:
         # Set the branch variable
-        units = setVar(dict, branchLiteral, partial_assignment)
+        lefv, units = setVar(dict, branchLiteral, partial_assignment)
 
         # If the branching variable led to an empty clause then try the other variable
         if units == False:
             continue
 
         # Branch on the variable that was set
-        result = backtrackWL(dict, partial_assignment, units, orderVars)
+        result = backtrackWL(dict, partial_assignment, units, orderVars, lefv if (lefv is not None) else None)
         if result:
             return result
         
@@ -386,6 +389,7 @@ def backtrackWL(dict, partial_assignment, u_literals, orderVars):
 
 # Sets the variable, updates the dict and partial_assignment
 def setVar(dict, var, partial_assignment):
+    lefv = None
     units = set() # Units found while setting the variable
     partial_assignment[abs(var)] = var # Set the variable in the partial_assignment
     
@@ -402,7 +406,7 @@ def setVar(dict, var, partial_assignment):
         if not unassigned_variables:
             newList += dict[-var][count:]
             dict[-var] = newList
-            return False   
+            return None, False   
         # The clause is unsat but has one free variable so it is a unit literal
         elif len(unassigned_variables) == 1:
             units.add(unassigned_variables[0])
@@ -411,11 +415,12 @@ def setVar(dict, var, partial_assignment):
         else:
             newLiteral = nextWatchLiteral(dict, clause, unassigned_variables)
             dict[newLiteral].append(clause)
+            lefv = newLiteral
     
     dict[-var] = newList
     
     # Return all the unit literals that have been found
-    return units
+    return lefv, units
 
 # Given a list of variables, they are set to 0 in the partial assignment (unassigned)
 def unassignVars(partial_assignment, vars):
@@ -456,7 +461,7 @@ fp = 'sat_instances/'
 # clauses = load_dimacs(fp +'W_2,3_ n=8.txt')
 # clauses = load_dimacs(fp +'PHP-5-4.txt')
 # clauses = load_dimacs(fp +'LNP-6.txt')
-clauses = load_dimacs(fp +'gt.txt')
-# clauses = load_dimacs(fp +'8queens.txt')
+# clauses = load_dimacs(fp +'gt.txt')
+clauses = load_dimacs(fp +'8queens.txt')
 
 print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=10, repeat=100))))
