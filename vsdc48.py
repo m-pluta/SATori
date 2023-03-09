@@ -389,31 +389,29 @@ def setVar(dict, var, partial_assignment):
     lefv = None
     units = set() # Units found while setting the variable
     partial_assignment[abs(var)] = var # Set the variable in the partial_assignment
+
+    if not dict[-var]:
+        return None, units
     
-    newList = [] # Clauses that should remain in the watch literal
-    for count, clause in enumerate(dict[-var]):
-        # If the clause is already true then it keep being watched by that literal, and skip it
+    for i in range(len(dict[-var]) - 1, -1, -1):
+        clause = dict[-var][i]
+
         if isClauseSat(clause, partial_assignment):
-            newList.append(clause)
             continue
         
         unassigned_variables = [literal for literal in clause if partial_assignment[abs(literal)] == 0]
         
         # The clause is unsat and has no free variables so it is an empty clause
         if not unassigned_variables:
-            newList += dict[-var][count:]
-            dict[-var] = newList
             return None, False   
         # The clause is unsat but has one free variable so it is a unit literal
         elif len(unassigned_variables) == 1:
             units.add(unassigned_variables[0])
-            newList.append(clause)
         # The clause is unsat and has >1 free variable so it is possible to switch the watch literal
         else:
             lefv = nextWatchLiteral(dict, clause, unassigned_variables)
-            dict[lefv].append(clause)
-    
-    dict[-var] = newList
+            dict[lefv].append(clause[:])
+            dict[-var].pop(i)
     
     # Return all the unit literals that have been found
     return lefv, units
@@ -460,7 +458,7 @@ fp = 'sat_instances/'
 clauses = load_dimacs(fp +'gt.txt')
 # clauses = load_dimacs(fp +'8queens.txt')
 
-print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
+print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=10))))
 
 sol = dpll_sat_solve(clauses)
 print(sol)
