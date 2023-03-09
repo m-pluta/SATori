@@ -3,7 +3,6 @@ import timeit
 import numpy as np
 from collections import Counter, deque
 from itertools import product, chain
-from printUtils import printTime
 
 def load_dimacs(filepath):
     # Open file and read lines
@@ -135,117 +134,118 @@ def unit_propagate(clause_set):
     return return_clause_set
 
 
-# Returns the next variable to branch on, which is the most common one
-def getNextBranchVariable(clause_set):
-    # Return the most common variable in the clause_set
-    return Counter(chain.from_iterable(clause_set)).most_common(1)[0][0]
 
-# Returns None if [] is generated during propagation
-# Returns new_clause_set if propagation was successful (could be an empty clause set)
-def UP(clause_set, unit_literals):
-    # Return original clause_set if no unit literals to propagate over
-    if not unit_literals:
-        return clause_set
+# # Returns the next variable to branch on, which is the most common one
+# def getNextBranchVariable(clause_set):
+#     # Return the most common variable in the clause_set
+#     return Counter(chain.from_iterable(clause_set)).most_common(1)[0][0]
 
-    # Go through each clause and create a copy of it
-    new_clause_set = []
-    for clause in clause_set:
-        clause_copy = clause[:]
-        # Check if the clause contains any unit literals
-        for unit_literal in unit_literals:
-            # If the unit literal is in the clause then remove the whole clause and break
-            if unit_literal in clause_copy:
-                clause_copy = None
-                break
-            # If the complemented literal is in the clause then remove the variable
-            elif (-unit_literal) in clause_copy:
-                clause_copy.remove(-unit_literal)
+# # Returns None if [] is generated during propagation
+# # Returns new_clause_set if propagation was successful (could be an empty clause set)
+# def UP(clause_set, unit_literals):
+#     # Return original clause_set if no unit literals to propagate over
+#     if not unit_literals:
+#         return clause_set
 
-                if not clause_copy:
-                    return None
+#     # Go through each clause and create a copy of it
+#     new_clause_set = []
+#     for clause in clause_set:
+#         clause_copy = clause[:]
+#         # Check if the clause contains any unit literals
+#         for unit_literal in unit_literals:
+#             # If the unit literal is in the clause then remove the whole clause and break
+#             if unit_literal in clause_copy:
+#                 clause_copy = None
+#                 break
+#             # If the complemented literal is in the clause then remove the variable
+#             elif (-unit_literal) in clause_copy:
+#                 clause_copy.remove(-unit_literal)
 
-        if clause_copy is not None:
-            new_clause_set.append(clause_copy)
+#                 if not clause_copy:
+#                     return None
+
+#         if clause_copy is not None:
+#             new_clause_set.append(clause_copy)
     
-    return new_clause_set
+#     return new_clause_set
 
-# Main backtracking function
-def dpll_sat_solve(clause_set, partial_assignment=[]):
-    new_clause_set = clause_set
+# # Main backtracking function
+# def dpll_sat_solve(clause_set, partial_assignment=[]):
+#     new_clause_set = clause_set
 
-# Branching on current variable
+# # Branching on current variable
 
-    # If first dpll_solve recursion
-    if not partial_assignment:
-        # If clause set is empty then sat
-        if not clause_set:
-            return []
-        # Check if the initial clause_set is unsatisfiable
-        if [] in clause_set:
-            return False
-    else:
-        # Branch on the last variable added to the partial assignment
-        branch_clause_set=branchDPLL(clause_set, partial_assignment[-1])
-        if branch_clause_set == None:
-            return False
-        if not branch_clause_set:
-            return partial_assignment
+#     # If first dpll_solve recursion
+#     if not partial_assignment:
+#         # If clause set is empty then sat
+#         if not clause_set:
+#             return []
+#         # Check if the initial clause_set is unsatisfiable
+#         if [] in clause_set:
+#             return False
+#     else:
+#         # Branch on the last variable added to the partial assignment
+#         branch_clause_set=branchDPLL(clause_set, partial_assignment[-1])
+#         if branch_clause_set == None:
+#             return False
+#         if not branch_clause_set:
+#             return partial_assignment
 
-        new_clause_set = branch_clause_set
+#         new_clause_set = branch_clause_set
     
-# Unit propagation
+# # Unit propagation
 
-    # Unit propagate with deletion
-    unit_literals = set([clause[0] for clause in new_clause_set if len(clause) == 1])
-    while (unit_literals):
-        if containsComplementPair(unit_literals):
-            return False
-        new_clause_set = UP(new_clause_set, unit_literals)
-        if new_clause_set is None:
-            return False
-        elif not new_clause_set:
-            return partial_assignment
-        unit_literals = set([clause[0] for clause in new_clause_set if len(clause) == 1])
+#     # Unit propagate with deletion
+#     unit_literals = set([clause[0] for clause in new_clause_set if len(clause) == 1])
+#     while (unit_literals):
+#         if containsComplementPair(unit_literals):
+#             return False
+#         new_clause_set = UP(new_clause_set, unit_literals)
+#         if new_clause_set is None:
+#             return False
+#         elif not new_clause_set:
+#             return partial_assignment
+#         unit_literals = set([clause[0] for clause in new_clause_set if len(clause) == 1])
 
-    if not new_clause_set:
-        return partial_assignment
+#     if not new_clause_set:
+#         return partial_assignment
 
-    # Choose next branching variable
-    nextVariable = getNextBranchVariable(new_clause_set)
+#     # Choose next branching variable
+#     nextVariable = getNextBranchVariable(new_clause_set)
 
-# Branching to next variables
+# # Branching to next variables
 
-    # Branch on each truth assignment
-    for literal in [nextVariable,-nextVariable]:
-        # Store branch result
-        result = dpll_sat_solve(new_clause_set, partial_assignment + [literal])
-        # If a result was returned then it must be a solution
-        if result:
-            return result
+#     # Branch on each truth assignment
+#     for literal in [nextVariable,-nextVariable]:
+#         # Store branch result
+#         result = dpll_sat_solve(new_clause_set, partial_assignment + [literal])
+#         # If a result was returned then it must be a solution
+#         if result:
+#             return result
 
-    return False
+#     return False
 
-# Returns None if [] is generated during branching
-# Returns new_clause_set if branching was successful (could be an empty clause set)
-def branchDPLL(clause_set, branchOn):
-    new_clause_set = []
+# # Returns None if [] is generated during branching
+# # Returns new_clause_set if branching was successful (could be an empty clause set)
+# def branchDPLL(clause_set, branchOn):
+#     new_clause_set = []
     
-    # Go through each clause
-    for clause in clause_set:
-        # If the exact literal is in the clause then there is no point adding it to the new clause because it gets eliminated
-        if branchOn not in clause:
-            # Copy the clause
-            clause_copy = clause[:]
-            if (-branchOn) in clause_copy:
-                clause_copy.remove(-branchOn)
+#     # Go through each clause
+#     for clause in clause_set:
+#         # If the exact literal is in the clause then there is no point adding it to the new clause because it gets eliminated
+#         if branchOn not in clause:
+#             # Copy the clause
+#             clause_copy = clause[:]
+#             if (-branchOn) in clause_copy:
+#                 clause_copy.remove(-branchOn)
 
-                # If the clause is empty after removal then clause_set is unsat and return
-                if not clause_copy:
-                    return None
+#                 # If the clause is empty after removal then clause_set is unsat and return
+#                 if not clause_copy:
+#                     return None
             
-            new_clause_set.append(clause_copy)
+#             new_clause_set.append(clause_copy)
 
-    return new_clause_set
+#     return new_clause_set
 
 # Returns True if the unit literals contain a complement pair i.e {-1, 1} or {7, -7}
 def containsComplementPair(literals):
@@ -262,6 +262,190 @@ def containsComplementPair(literals):
 
 
 
+
+
+
+
+
+# Returns the variables ordered in descending order of occurrence given a Counter object
+def orderVars(vars):
+    order = []
+    # Order the variables in descending order of occurrence
+    for var in vars.most_common():
+        if -var[0] not in order:
+            order.append(var[0])
+    return order
+
+# Initialises a dictionary with 0s for each variable
+def createPartialAssignment(vars):
+    return dict.fromkeys([abs(var) for var in vars], 0)
+
+# Initialise the dictionary which stores the clauses
+def initialiseWatchedLiterals(order):
+    watched_literals = {}
+    for var in order:
+        watched_literals[var] = []
+        watched_literals[-var] = []
+    return watched_literals
+
+# Return the watched literal dict, initial unit_literals, frequency order of variables
+def dictify(clause_set):
+    # Count all literals
+    vars = Counter(chain.from_iterable(clause_set))
+
+    # Order the variables
+    order = orderVars(vars)
+    
+    watched_literals = initialiseWatchedLiterals(order)
+    
+    initial_unit_literals = set()
+
+    # Go through each clause set and identify them as a unit clause or give them two watched-literals
+    for clause in clause_set:
+        if len(clause) == 1:
+            initial_unit_literals.add(clause[0])
+            continue
+        if clause not in watched_literals[clause[0]]:
+            watched_literals[clause[0]].append(clause)
+            watched_literals[clause[1]].append(clause)
+
+    return watched_literals, initial_unit_literals, order
+
+# Main callable function
+def dpll_sat_solve(clause_set, partial_assignment=None):
+    if not clause_set:
+        return []
+    if [] in clause_set:
+        return False
+    
+    dict, u_literals, orderVars = dictify(clause_set)
+    partial_assignment = createPartialAssignment(orderVars)
+
+    result = backtrackWL(dict, partial_assignment, u_literals, orderVars)
+    
+    # If there is a result, convert it from dictionary to list 
+    return [i for i in result.values()] if result else False
+
+# Iterative unit propagation
+def unit_propagateWL(dict, units, partial_assignment):
+    units_propagated = [] # Unit literals that have so far been set to true
+    u_literals = list(units)
+
+    while u_literals:
+        # If there is complement pair in the literal list then there is a conflict
+        # e.g. if 1 and -1 are in the list then both of them cannot be true
+        if containsComplementPair(u_literals):
+            # Unassign all the variables that have been so far set to true during unit prop and return
+            unassignVars(partial_assignment, units_propagated)
+            return False
+        
+        nextUnit = u_literals.pop(0)
+
+        # Set the unit literal to true and add new unit literals to the queue
+        newUnits = setVar(dict, nextUnit, partial_assignment)
+        u_literals.extend(list(newUnits))
+        units_propagated.append(nextUnit)
+
+    return units_propagated
+
+# Main function
+def backtrackWL(dict, partial_assignment, u_literals, orderVars):
+    if u_literals:
+        # Unit Propagate functions returns all units that were iteratively propagated over
+        # Provided units could have led to more unit literals
+        u_literals = unit_propagateWL(dict, u_literals, partial_assignment)
+        if not u_literals:
+            # If the unit prop returned False then there was a ComplementPair conflict
+            return
+
+    # If the partial assignment is full then return it
+    if 0 not in partial_assignment.values():
+        return partial_assignment
+
+    nextVariable = getNextVariable(orderVars, partial_assignment)
+
+    for branchLiteral in [nextVariable, -nextVariable]:
+        # Set the branch variable
+        units = setVar(dict, branchLiteral, partial_assignment)
+
+        # If the branching variable led to an empty clause then try the other variable
+        if units == False:
+            continue
+
+        # Branch on the variable that was set
+        result = backtrackWL(dict, partial_assignment, units, orderVars)
+        if result:
+            return result
+        
+        # Unassign the branch variable if it didnt lead to a solution
+        partial_assignment[abs(branchLiteral)] = 0
+
+    # Unset all the unit literals before backtracking
+    unassignVars(partial_assignment, u_literals)
+    return False
+
+# Sets the variable, updates the dict and partial_assignment
+def setVar(dict, var, partial_assignment):
+    units = set() # Units found while setting the variable
+    partial_assignment[abs(var)] = var # Set the variable in the partial_assignment
+    
+    newList = [] # Clauses that should remain in the watch literal
+    for clause in dict[-var]:
+        # If the clause is already true then it keep being watched by that literal, and skip it
+        if isClauseSat(clause, partial_assignment):
+            newList.append(clause)
+            continue
+        
+        unassigned_variables = [literal for literal in clause if partial_assignment[abs(literal)] == 0]
+        
+        # The clause is unsat and has no free variables so it is an empty clause
+        if not unassigned_variables:
+            return False
+        # The clause is unsat but has one free variable so it is a unit literal
+        elif len(unassigned_variables) == 1:
+            units.add(unassigned_variables[0])
+            newList.append(clause)
+        # The clause is unsat and has >1 free variable so it is possible to switch the watch literal
+        else:
+            newLiteral = nextWatchLiteral(dict, clause, unassigned_variables)
+            dict[newLiteral].append(clause)
+    
+    dict[-var] = newList
+    
+    # Return all the unit literals that have been found
+    return units
+
+# Given a list of variables, they are set to 0 in the partial assignment (unassigned)
+def unassignVars(partial_assignment, vars):
+    for var in vars:
+        partial_assignment[abs(var)] = 0
+
+# Determines which literal in a clause should be watched
+def nextWatchLiteral(dict, clause, unassigned_variables):
+    for var in unassigned_variables:
+        # If the literal is not already a watched literal
+        if clause not in dict[var]:
+            return var
+    return None
+
+# Checks if a given clause is True
+def isClauseSat(clause, partial_assignment):
+    for literal in clause:
+        # Check if any variable in the partial assignment satisfies the clause
+        if partial_assignment[abs(literal)] == literal:
+            return True
+    return False
+
+# Returns the most common free variable
+def getNextVariable(orderVars, partial_assignment):
+    for var in orderVars:
+        # Returns variable if it is free
+        if partial_assignment[abs(var)] == 0:
+            return var
+    return None
+
+
+
 fp = 'sat_instances/'
 
 # clauses = load_dimacs(fp +'unsat.txt')
@@ -273,5 +457,4 @@ fp = 'sat_instances/'
 # clauses = load_dimacs(fp +'gt.txt')
 # clauses = load_dimacs(fp +'8queens.txt')
 
-# printTime(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=3))))
-# print(dpll_sat_solve(clauses))
+# print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=10, repeat=100))))
