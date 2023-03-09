@@ -131,7 +131,7 @@ def setVar(clause_set, var):
 # clauses = load_dimacs('instances/unsat.txt')
 # clauses = load_dimacs('instances/sat.txt')
 # clauses = load_dimacs('instances/customSAT.txt')
-# clauses = load_dimacs('instances/W_2,3_ n=8.txt')
+clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 # clauses = load_dimacs('instances/PHP-5-4.txt')
 # clauses = load_dimacs('instances/LNP-6.txt')
 # clauses = load_dimacs('instances/8queens.txt')

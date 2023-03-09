@@ -246,10 +246,12 @@ def branchDPLL(clause_set, branchOn):
 
 # Returns True if the unit literals contain a complement pair i.e {-1, 1} or {7, -7}
 def containsComplementPair(literals):
+    seen = set()
     # Go through each literal
     for literal in literals:
-        # If its complement is in the literal list then there is a complement pair
-        if -literal in literals:
+        seen.add(literal)
+        # If its complement has already been seen then there is a complement pair
+        if -literal in seen:
             return True
         
     # No complement pairs found
@@ -261,7 +263,7 @@ def containsComplementPair(literals):
 # clauses = load_dimacs('instances/customSAT.txt')
 # clauses = load_dimacs('instances/W_2,3_ n=8.txt')
 # clauses = load_dimacs('instances/PHP-5-4.txt')
-# clauses = load_dimacs('instances/LNP-6.txt')
+# clauses = load_dimacs('instances/gt.txt')
 # clauses = load_dimacs('instances/gt.txt')
 # clauses = load_dimacs('instances/8queens.txt')
 
