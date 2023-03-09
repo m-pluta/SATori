@@ -410,9 +410,8 @@ def setVar(dict, var, partial_assignment):
             newList.append(clause)
         # The clause is unsat and has >1 free variable so it is possible to switch the watch literal
         else:
-            newLiteral = nextWatchLiteral(dict, clause, unassigned_variables)
-            dict[newLiteral].append(clause)
-            lefv = newLiteral
+            lefv = nextWatchLiteral(dict, clause, unassigned_variables)
+            dict[lefv].append(clause)
     
     dict[-var] = newList
     
