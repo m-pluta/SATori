@@ -11,7 +11,6 @@ def orderVars(vars):
     order = []
     # Order the variables in descending order of occurrence
     for var in vars.most_common():
-        # If the literal's complement is already in the order then don't append it
         if -var[0] not in order:
             order.append(var[0])
     return order
@@ -20,14 +19,13 @@ def orderVars(vars):
 def createPartialAssignment(vars):
     return dict.fromkeys([abs(var) for var in vars], 0)
 
+# Initialise the dictionary which stores the clauses
 def initialiseWatchedLiterals(order):
     watched_literals = {}
     for var in order:
         watched_literals[var] = []
         watched_literals[-var] = []
     return watched_literals
-    # Potential alternative:
-    # watched_literals = dict.fromkeys(vars.keys(), [])
 
 # Return the watched literal dict, initial unit_literals, frequency order of variables
 def dictify(clause_set):
@@ -37,11 +35,10 @@ def dictify(clause_set):
     # Order the variables
     order = orderVars(vars)
     
-    # Initialise each literal in the dict with an empty list
     watched_literals = initialiseWatchedLiterals(order)
     
-    # List for unit literals found in the initial clause_set
     initial_unit_literals = set()
+
     # Go through each clause set and identify them as a unit clause or give them two watched-literals
     for clause in clause_set:
         if len(clause) == 1:
@@ -53,21 +50,18 @@ def dictify(clause_set):
 
     return watched_literals, initial_unit_literals, order
 
+# Main callable function
 def dpll_sat_solve(clause_set, partial_assignment=None):
-    # Setup DPLL
     dict, u_literals, orderVars = dictify(clause_set)
-    # Initialise partial assignment
     partial_assignment = createPartialAssignment(orderVars)
 
-    # Attempt to find solution
     result = backtrack(dict, partial_assignment, u_literals, orderVars)
     
     # If there is a result, convert it from dictionary to list 
     return [i for i in result.values()] if result else False
 
-
+# Iterative unit propagation
 def unit_propagate(dict, units, partial_assignment):
-    # Init
     units_propagated = [] # Unit literals that have so far been set to true
     u_literals = list(units)
 
@@ -79,46 +73,36 @@ def unit_propagate(dict, units, partial_assignment):
             unassignVars(partial_assignment, units_propagated)
             return False
         
-        # Dequeue next unit literal
-        var = u_literals.pop(0)
+        nextUnit = u_literals.pop(0)
 
         # Set the unit literal to true and add new unit literals to the queue
-        newUnits = setVar(dict, var, partial_assignment)
+        newUnits = setVar(dict, nextUnit, partial_assignment)
         u_literals.extend(list(newUnits))
-
-        units_propagated.append(var)
+        units_propagated.append(nextUnit)
 
     return units_propagated
 
 # Main function
 def backtrack(dict, partial_assignment, u_literals, orderVars):
-    # Unit propagate over all the unit literals
     if u_literals:
-        # Unit Propagate functions returns all units that were recursively propagated
-        # i.e. Provided units could have led to more unit literals
+        # Unit Propagate functions returns all units that were iteratively propagated over
+        # Provided units could have led to more unit literals
         u_literals = unit_propagate(dict, u_literals, partial_assignment)
         if not u_literals:
             # If the unit prop returned False then there was a ComplementPair conflict
             return
 
-    # If the partial assignment is full then return it, it must be correct
+    # If the partial assignment is full then return it
     if 0 not in partial_assignment.values():
         return partial_assignment
-    
-
-    # if Φ contains an empty clause then
-    #     return false
-
 
     nextVariable = getNextVariable(orderVars, partial_assignment)
 
-    # Branch to the positive and negative literals
     for branchLiteral in [nextVariable, -nextVariable]:
-        # Set the variable
+        # Set the branch variable
         units = setVar(dict, branchLiteral, partial_assignment)
 
-        # If the branching variable led to an empty clause
-        # then try the other variable, or backtrack by exiting for each loop
+        # If the branching variable led to an empty clause then try the other variable
         if units == False:
             continue
 
@@ -127,7 +111,7 @@ def backtrack(dict, partial_assignment, u_literals, orderVars):
         if result:
             return result
         
-        # Unassign the set variable if it didnt lead to a solution
+        # Unassign the branch variable if it didnt lead to a solution
         partial_assignment[abs(branchLiteral)] = 0
 
     # Unset all the unit literals before backtracking
@@ -160,10 +144,12 @@ def setVar(dict, var, partial_assignment):
             newLiteral = nextWatchLiteral(dict, clause, unassigned_variables)
             dict[newLiteral].append(clause)
     
-    dict[-var] = newList # Update the dict
-    return units # Return all the unit literals that have been found
+    dict[-var] = newList
+    
+    # Return all the unit literals that have been found
+    return units
 
-# Given a list of variables to unassign, they are set to 0 in the partial assignment
+# Given a list of variables, they are set to 0 in the partial assignment (unassigned)
 def unassignVars(partial_assignment, vars):
     for var in vars:
         partial_assignment[abs(var)] = 0
@@ -171,7 +157,7 @@ def unassignVars(partial_assignment, vars):
 # Determines which literal in a clause should be watched
 def nextWatchLiteral(dict, clause, unassigned_variables):
     for var in unassigned_variables:
-        # If the literal is not a watched literal already
+        # If the literal is not already a watched literal
         if clause not in dict[var]:
             return var
     return None
