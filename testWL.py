@@ -77,8 +77,25 @@ def sw100():
                     print(fileName)
                     sys.exit()
 
-uf20()
-uuf50_218()
-flat50()
-CBS()
+from os import listdir
+
+def QG():
+    dir = 'sat_instances/QG'
+    for file in listdir(dir):
+        if file in ('qg1-08.cnf', 'qg2-08.cnf'):
+            continue
+        print(file)
+        filePath = dir + '/' + file
+        sat_instance = load_dimacs(filePath)
+        result = dpll_sat_solve(sat_instance)
+        print(result)
+        if result:
+            print(check_truth_assignment(sat_instance, result))
+
+# uf20()
+# uuf50_218()
+# flat50()
+# CBS()
 # sw100()
+
+# QG()
