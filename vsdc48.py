@@ -295,10 +295,10 @@ def dictify(clause_set):
 
     # Order the variables
     order = orderVars(most_common_vars)
-    
+
+    pure_literals = getPureLiterals(most_common_vars)
     watched_literals = initialiseWatchedLiterals(order)
-    
-    initial_unit_literals = set()
+    initial_unit_literals = pure_literals
 
     # Go through each clause set and identify them as a unit clause or give them two watched-literals
     for clause in clause_set:
@@ -310,6 +310,13 @@ def dictify(clause_set):
             watched_literals[clause[1]].append(clause)
 
     return watched_literals, initial_unit_literals, order
+
+def getPureLiterals(most_common_vars):
+    PLs = set()
+    for var in (vars := {var[0] for var in most_common_vars}):
+        if -var not in vars:
+            PLs.add(var)
+    return PLs
 
 # Main callable function
 def dpll_sat_solve(clause_set, partial_assignment=None):
