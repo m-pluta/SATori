@@ -271,7 +271,7 @@ def containsComplementPair(literals):
 def orderVars(vars):
     order = []
     # Order the variables in descending order of occurrence
-    for var in vars.most_common():
+    for var in vars:
         if -var[0] not in order:
             order.append(var[0])
     return order
@@ -291,10 +291,10 @@ def initialiseWatchedLiterals(order):
 # Return the watched literal dict, initial unit_literals, frequency order of variables
 def dictify(clause_set):
     # Count all literals
-    vars = Counter(chain.from_iterable(clause_set))
+    most_common_vars = Counter(chain.from_iterable(clause_set)).most_common()
 
     # Order the variables
-    order = orderVars(vars)
+    order = orderVars(most_common_vars)
     
     watched_literals = initialiseWatchedLiterals(order)
     
@@ -373,7 +373,7 @@ def backtrackWL(dict, partial_assignment, u_literals, orderVars, lefv=None):
             continue
 
         # Branch on the variable that was set
-        result = backtrackWL(dict, partial_assignment, units, orderVars, lefv if (lefv is not None) else None)
+        result = backtrackWL(dict, partial_assignment, units, orderVars, lefv)
         if result:
             return result
         
