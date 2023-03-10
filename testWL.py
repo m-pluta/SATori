@@ -1,4 +1,4 @@
-from vsdc48 import dpll_sat_solve
+from vsdc48 import dpll_sat_solve, check_truth_assignment
 import timeit
 import sys
 
@@ -23,6 +23,16 @@ def uf20():
         sat_instance = load_dimacs(fileName)
         result = dpll_sat_solve(sat_instance)
         if not result:
+            print(fileName)
+            sys.exit()
+
+def uuf50_218():
+    print("uuf50-218")
+    for fileCount in range(1, 1001):
+        fileName = f'sat_instances/uuf50-218/uuf50-0{fileCount}.cnf'
+        sat_instance = load_dimacs(fileName)
+        result = dpll_sat_solve(sat_instance)
+        if result:
             print(fileName)
             sys.exit()
 
@@ -68,6 +78,7 @@ def sw100():
                     sys.exit()
 
 uf20()
+uuf50_218()
 flat50()
 CBS()
 # sw100()
