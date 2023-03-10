@@ -79,18 +79,20 @@ def sw100():
 
 from os import listdir
 
-def QG():
-    dir = 'sat_instances/QG'
-    for file in listdir(dir):
-        if file in ('qg1-08.cnf', 'qg2-08.cnf'):
-            continue
-        print(file)
-        filePath = dir + '/' + file
-        sat_instance = load_dimacs(filePath)
-        result = dpll_sat_solve(sat_instance)
-        print(result)
-        if result:
-            print(check_truth_assignment(sat_instance, result))
+def testAll():
+    fp = 'sat_instances/'
+    for dir in ['blocksworld', 'ais', 'QG', 'logistics', 'f' 'flat200-479', 'gcp-large', 'bmc']:
+        print(dir)
+        for file in listdir(fp + dir):
+            if file in ('qg1-08.cnf', 'qg2-08.cnf'):
+                continue
+            print(file)
+            filePath = fp + dir + '/' + file
+            sat_instance = load_dimacs(filePath)
+            result = dpll_sat_solve(sat_instance)
+            print(result)
+            if result:
+                print(check_truth_assignment(sat_instance, result))
 
 # uf20()
 # uuf50_218()
@@ -98,4 +100,4 @@ def QG():
 # CBS()
 # sw100()
 
-# QG()
+testAll()
