@@ -278,7 +278,13 @@ def orderVars(vars):
 
 # Initialises a dictionary with 0s for each variable
 def createPartialAssignment(vars):
-    return dict.fromkeys([abs(var) for var in vars], 0)
+    partial_assignment = {}
+
+    for var in vars:
+        partial_assignment[var] = 0
+        partial_assignment[-var] = 0
+
+    return partial_assignment
 
 # Initialise the dictionary which stores the clauses
 def initialiseWatchedLiterals(order):
@@ -385,7 +391,8 @@ def backtrackWL(dict, partial_assignment, u_literals, orderVars, lefv=None):
             return result
         
         # Unassign the branch variable if it didnt lead to a solution
-        partial_assignment[abs(branchLiteral)] = 0
+        partial_assignment[branchLiteral] = 0
+        partial_assignment[-branchLiteral] = 0
 
     # Unset all the unit literals before backtracking
     unassignVars(partial_assignment, u_literals)
@@ -395,8 +402,9 @@ def backtrackWL(dict, partial_assignment, u_literals, orderVars, lefv=None):
 def setVar(dict, var, partial_assignment):
     lefv = None
     units = set() # Units found while setting the variable
-    partial_assignment[abs(var)] = var # Set the variable in the partial_assignment
-    
+    partial_assignment[var] = var # Set the variable in the partial_assignment
+    partial_assignment[-var] = var
+
     removed = 0
     newList = dict[-var].copy() # Clauses that should remain in the watch literal
     for count, clause in enumerate(dict[-var]):
@@ -428,7 +436,8 @@ def setVar(dict, var, partial_assignment):
 # Given a list of variables, they are set to 0 in the partial assignment (unassigned)
 def unassignVars(partial_assignment, vars):
     for var in vars:
-        partial_assignment[abs(var)] = 0
+        partial_assignment[var] = 0
+        partial_assignment[-var] = 0
 
 # Determines which literal in a clause should be watched
 def nextWatchLiteral(dict, clause, unassigned_variables):
@@ -442,7 +451,7 @@ def nextWatchLiteral(dict, clause, unassigned_variables):
 def isClauseSat(clause, partial_assignment):
     for literal in clause:
         # Check if any variable in the partial assignment satisfies the clause
-        if partial_assignment[abs(literal)] == literal:
+        if partial_assignment[literal] == literal:
             return True
     return False
 
@@ -450,7 +459,7 @@ def isClauseSat(clause, partial_assignment):
 def getNextVariable(orderVars, partial_assignment):
     for var in orderVars:
         # Returns variable if it is free
-        if partial_assignment[abs(var)] == 0:
+        if partial_assignment[var] == 0:
             return var
     return None
 
@@ -467,7 +476,7 @@ fp = 'sat_instances/'
 # clauses = load_dimacs(fp +'gt.txt')
 clauses = load_dimacs(fp +'8queens.txt')
 
-print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=10, repeat=100))))
+# print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=10, repeat=100))))
 
 # sol = dpll_sat_solve(clauses)
 # print(sol)
