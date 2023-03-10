@@ -397,28 +397,28 @@ def setVar(dict, var, partial_assignment):
     units = set() # Units found while setting the variable
     partial_assignment[abs(var)] = var # Set the variable in the partial_assignment
     
-    newList = [] # Clauses that should remain in the watch literal
+    removed = 0
+    newList = dict[-var].copy() # Clauses that should remain in the watch literal
     for count, clause in enumerate(dict[-var]):
         # If the clause is already true then it keep being watched by that literal, and skip it
         if isClauseSat(clause, partial_assignment):
-            newList.append(clause)
             continue
         
         unassigned_variables = [literal for literal in clause if partial_assignment[abs(literal)] == 0]
         
         # The clause is unsat and has no free variables so it is an empty clause
         if not unassigned_variables:
-            newList += dict[-var][count:]
             dict[-var] = newList
             return None, False   
         # The clause is unsat but has one free variable so it is a unit literal
         elif len(unassigned_variables) == 1:
             units.add(unassigned_variables[0])
-            newList.append(clause)
         # The clause is unsat and has >1 free variable so it is possible to switch the watch literal
         else:
             lefv = nextWatchLiteral(dict, clause, unassigned_variables)
             dict[lefv].append(clause)
+            newList.pop(count - removed)
+            removed += 1
     
     dict[-var] = newList
     
@@ -465,9 +465,9 @@ fp = 'sat_instances/'
 # clauses = load_dimacs(fp +'PHP-5-4.txt')
 # clauses = load_dimacs(fp +'LNP-6.txt')
 # clauses = load_dimacs(fp +'gt.txt')
-# clauses = load_dimacs(fp +'8queens.txt')
+clauses = load_dimacs(fp +'8queens.txt')
 
-# print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
+print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=10, repeat=100))))
 
 # sol = dpll_sat_solve(clauses)
 # print(sol)
