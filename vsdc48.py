@@ -369,7 +369,7 @@ def backtrackWL(dict, partial_assignment, u_literals, orderVars, lefv=None):
     if 0 not in partial_assignment.values():
         return partial_assignment
 
-    nextVariable = lefv if (lefv is not None) else getNextVariable(orderVars, partial_assignment)
+    nextVariable = lefv if lefv else getNextVariable(orderVars, partial_assignment)
 
     for branchLiteral in [nextVariable, -nextVariable]:
         # Set the branch variable
@@ -380,8 +380,7 @@ def backtrackWL(dict, partial_assignment, u_literals, orderVars, lefv=None):
             continue
 
         # Branch on the variable that was set
-        result = backtrackWL(dict, partial_assignment, units, orderVars, lefv)
-        if result:
+        if result := backtrackWL(dict, partial_assignment, units, orderVars, lefv):
             return result
         
         # Unassign the branch variable if it didnt lead to a solution
