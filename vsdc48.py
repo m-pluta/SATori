@@ -290,13 +290,12 @@ def setVar(dict, var, partial_assignment):
     lefv = None
     units = set()
     partial_assignment[abs(var)] = var
-    _abs = abs
     
     removed = 0 # How many clauses have been assigned a new watch literal, used as an offset
     newList = dict[-var].copy() # Clauses that should remain in the watch literal
 
     for count, clause in enumerate(dict[-var]):
-        if isClauseSat(clause, partial_assignment, _abs):
+        if isClauseSat(clause, partial_assignment):
             continue
         
         unassigned_variables = [literal for literal in clause if partial_assignment[abs(literal)] == 0]
