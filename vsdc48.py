@@ -348,9 +348,9 @@ def getNextVariable(orderVars, partial_assignment):
 
 
 
-import timeit
+# import timeit
 
-fp = 'sat_instances/'
+# fp = 'sat_instances/'
 
 # clauses = load_dimacs(fp +'unsat.txt')
 # clauses = load_dimacs(fp +'sat.txt')
@@ -360,10 +360,10 @@ fp = 'sat_instances/'
 # clauses = load_dimacs(fp +'LNP-6.txt')
 # clauses = load_dimacs(fp +'gt.txt')
 # clauses = load_dimacs(fp +'8queens.txt')
-clauses = load_dimacs(fp + 'n=100.txt')
+# clauses = load_dimacs(fp + 'n=100.txt')
 
 
-print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=1, repeat=1))))
+# print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=10, repeat=100))))
 
 # sol = dpll_sat_solve(clauses)
 # print(sol)
