@@ -8,7 +8,7 @@ While Pure Literal Elimination may not offer asymptotic advantages, due to my pr
 
 ## Usage
 
-The project contain two main files which are `vsdc48.py` and `regularDPLL.py`.
+The project contains two main files which are `vsdc48.py` and `regularDPLL.py`.
 
 - `vsdc48.py` contains the most optimised algorithm.
 

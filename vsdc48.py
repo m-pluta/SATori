@@ -349,10 +349,10 @@ def getNextVariable(orderVars, partial_assignment):
 
 # import timeit
 
-# fp = 'sat_instances/'
+fp = 'sat_instances/'
 
 # clauses = load_dimacs(fp +'unsat.txt')
-# clauses = load_dimacs(fp +'sat.txt')
+clauses = load_dimacs(fp +'sat.txt')
 # clauses = load_dimacs(fp +'customSAT.txt')
 # clauses = load_dimacs(fp +'W_2,3_ n=8.txt')
 # clauses = load_dimacs(fp +'PHP-5-4.txt')
@@ -364,7 +364,7 @@ def getNextVariable(orderVars, partial_assignment):
 
 # print(np.mean(np.array(timeit.repeat('dpll_sat_solve(clauses)', globals=globals(), number=10, repeat=100))))
 
-# sol = dpll_sat_solve(clauses)
-# print(sol)
-# if sol:
-#     print(check_truth_assignment(clauses, sol))
+sol = dpll_sat_solve(clauses)
+print(sol)
+if sol:
+    print(check_truth_assignment(clauses, sol))
